@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: Qwerty-09
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create  # Creates tables on startup, drops on shutdown
+    show-sql: true           # Shows SQL statements (helpful for debugging)
