@@ -1,0 +1,1 @@
+Browser --8080--> Controller -> Service -> DAO ----> database
