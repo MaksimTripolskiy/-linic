@@ -11,5 +11,6 @@ public class ClinicPageController {
     @GetMapping(value = "/registerUser2")
     public String registerUser(Model model) {
         return "register-user";
+
     }
 }
