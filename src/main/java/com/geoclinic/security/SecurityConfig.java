@@ -20,6 +20,8 @@ public class SecurityConfig {
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
+    @Autowired
+    private Handler successHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,7 +38,9 @@ public class SecurityConfig {
                         // Any other request requires authentication
                         .anyRequest().authenticated()
                 )
+
                 .formLogin(form -> form
+                        .successHandler(successHandler)
                         .permitAll()
                 )
                 .logout(logout -> logout

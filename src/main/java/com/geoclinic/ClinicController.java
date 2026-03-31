@@ -38,6 +38,11 @@ public class ClinicController {
         return userService.registerNewUser(request).toString();  // fixme
     }
 
+//    @GetMapping(value = "/registerUser2")
+//    public String registerUser(Model model) {
+//        return "register-user";
+//
+//    }
 
 
 }

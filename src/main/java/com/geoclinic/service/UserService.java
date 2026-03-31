@@ -31,7 +31,7 @@ public class UserService {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole("USER");  // Default role
+        user.setRole("ADMIN");  // Default role
         user.setEnabled(true);  // Or false if email verification required
 
         return userRepository.save(user);

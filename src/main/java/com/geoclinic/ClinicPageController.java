@@ -8,9 +8,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class ClinicPageController {
 
 
-    @GetMapping(value = "/registerUser2")
-    public String registerUser(Model model) {
+    @GetMapping("/registerUser2")
+    public String registerUser() {
         return "register-user";
+
+    }
+
+    @GetMapping("/createClinic")
+    public String getCreateClinicPage() {
+        return "create-clinic";
 
     }
 }
