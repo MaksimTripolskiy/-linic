@@ -16,8 +16,17 @@ public class Clinic {
     private String name;
     @Column(name="type")
     private String type;
-    @OneToOne
-    private Coordinates coordinates;
+    @Column(name="latitude")
+    private double latitude;
+    @Column(name="longitude")
+    private double longitude;
+//    @OneToOne
+//    private Coordinates coordinates;
 
     public Clinic() {}
+
+    public Clinic(double latitude, double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }
