@@ -23,7 +23,6 @@ public class Clinic {
     private double longitude;
 
 
-    private List<Comment> comments;
 //    @OneToOne
 //    private Coordinates coordinates;
 

@@ -24,7 +24,7 @@ public class ClinicService {
 
     public void createClinic(Clinic clinic) {
         clinicDAO.save(clinic);
-    }
+    }           // todo clinic exists?
 
-    public void updateClinic(Clinic clinic) { clinicDAO.save(clinic); }     // todo
+    public void updateClinic(Clinic clinic) { clinicDAO.save(clinic); }     // todo clinic exists?
 }

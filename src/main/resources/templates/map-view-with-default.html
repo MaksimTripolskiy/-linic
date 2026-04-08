@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Карта клиник - Geoclinic</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f5f5;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+    }
+
+    .main-container {
+        display: flex;
+        padding: 20px;
+        gap: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .sidebar {
+        width: 320px;
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        height: fit-content;
+    }
+
+    .sidebar h3 {
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .search-box {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .clinic-list {
+        max-height: 400px;
+        overflow-y: auto;
+        margin-top: 15px;
+    }
+
+    .clinic-item {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .clinic-item:hover {
+        background: #f0f0f0;
+    }
+
+    .clinic-item h4 {
+        margin: 0 0 5px;
+        color: #667eea;
+    }
+
+    .clinic-item p {
+        margin: 0;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .map-container {
+        flex: 1;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    #map {
+        height: 600px;
+        width: 100%;
+    }
+
+    .specialty-filter {
+        margin: 15px 0;
+    }
+
+    .specialty-filter select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #5a67d8;
+    }
+
+    @media (max-width: 768px) {
+        .main-container {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+        }
+    }
+  </style>
+</head>
+<body>
+<div class="header">
+  <h1>🏥 Geoclinic - Карта медицинских центров</h1>
+  <p>Найдите ближайшие клиники на карте</p>
+</div>
+
+<div class="main-container">
+  <!-- Боковая панель -->
+  <div class="sidebar">
+    <h3>🔍 Поиск клиник</h3>
+
+    <input type="text" id="searchInput" class="search-box" placeholder="Поиск по названию...">
+
+    <div class="specialty-filter">
+      <select id="specialtyFilter">
+        <option value="all">Все специальности</option>
+        <option value="dental">Стоматология</option>
+        <option value="cardiology">Кардиология</option>
+        <option value="pediatrics">Педиатрия</option>
+        <option value="ophthalmology">Офтальмология</option>
+        <option value="neurology">Неврология</option>
+      </select>
+    </div>
+
+    <button id="allBtn">📍 Показать все</button>
+    <button id="nearbyBtn">📍 Показать ближайшие</button>
+    <button id="resetViewBtn">🗺️ Сбросить вид</button>
+
+    <h3>📋 Список клиник</h3>
+    <div id="clinicList" class="clinic-list">
+      <!-- Список будет заполнен JavaScript -->
+    </div>
+  </div>
+
+  <!-- Карта -->
+  <div class="map-container">
+    <div id="map"></div>
+  </div>
+</div>
+
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  // ============================================
+  // КЛИНИКИ ПО УМОЛЧАНИЮ (ДЛЯ ТЕСТИРОВАНИЯ)
+  // ============================================
+  const defaultClinics = [
+      {
+          id: 1,
+          name: "Центральная стоматология",
+          address: "ул. Тверская, 15, Москва",
+          phone: "+7 (495) 123-45-67",
+          specialty: "dental",
+          latitude: 55.7658,
+          longitude: 37.6065
+      },
+      {
+          id: 2,
+          name: "Кардиоцентр на Арбате",
+          address: "ул. Арбат, 25, Москва",
+          phone: "+7 (495) 234-56-78",
+          specialty: "cardiology",
+          latitude: 55.7512,
+          longitude: 37.5904
+      },
+      {
+          id: 3,
+          name: "Детская поликлиника №1",
+          address: "ул. Новослободская, 10, Москва",
+          phone: "+7 (495) 345-67-89",
+          specialty: "pediatrics",
+          latitude: 55.7775,
+          longitude: 37.5944
+      },
+      {
+          id: 4,
+          name: "Глазная клиника",
+          address: "ул. Пятницкая, 45, Москва",
+          phone: "+7 (495) 456-78-90",
+          specialty: "ophthalmology",
+          latitude: 55.7411,
+          longitude: 37.6247
+      },
+      {
+          id: 5,
+          name: "Неврологический центр",
+          address: "Ленинский проспект, 30, Москва",
+          phone: "+7 (495) 567-89-01",
+          specialty: "neurology",
+          latitude: 55.7089,
+          longitude: 37.5847
+      },
+      {
+          id: 6,
+          name: "Стоматология на Пресне",
+          address: "ул. Красная Пресня, 22, Москва",
+          phone: "+7 (495) 678-90-12",
+          specialty: "dental",
+          latitude: 55.7606,
+          longitude: 37.5723
+      },
+      {
+          id: 7,
+          name: "Семейная клиника",
+          address: "Кутузовский проспект, 12, Москва",
+          phone: "+7 (495) 789-01-23",
+          specialty: "pediatrics",
+          latitude: 55.7407,
+          longitude: 37.5309
+      },
+      {
+          id: 8,
+          name: "Клиника здорового сердца",
+          address: "ул. Большая Дмитровка, 8, Москва",
+          phone: "+7 (495) 890-12-34",
+          specialty: "cardiology",
+          latitude: 55.7609,
+          longitude: 37.6139
+      }
+  ];
+
+  // Получаем данные из Spring Model или используем клиники по умолчанию
+  let clinicsData = /*[[${clinics}]]*/ [];
+
+  // Если данные от Spring пустые, используем клиники по умолчанию
+  if (!clinicsData || clinicsData.length === 0) {
+      clinicsData = defaultClinics;
+      console.log('Используются тестовые клиники (${clinics} пуст)');
+  } else {
+      console.log('Используются клиники из базы данных:', clinicsData.length);
+  }
+
+  // Инициализация карты
+  const map = L.map('map').setView([55.751244, 37.618423], 12);
+
+  // Добавляем слой карты
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // Массив для хранения маркеров
+  let currentMarkerLayer = null;
+
+  // Кастомная иконка для клиник
+  const clinicIcon = L.divIcon({
+      html: '🏥',
+      iconSize: [30, 30],
+      className: 'clinic-marker',
+      popupAnchor: [0, -15]
+  });
+
+  // Функция для отображения клиник на карте
+  function displayClinics(clinics) {
+      // Удаляем старые маркеры
+      if (currentMarkerLayer) {
+          map.removeLayer(currentMarkerLayer);
+      }
+
+      // Создаем новый слой для маркеров
+      currentMarkerLayer = L.layerGroup().addTo(map);
+
+      console.log('Отображение клиник:', clinics.length);
+
+      // Добавляем маркеры для каждой клиники
+      clinics.forEach(clinic => {
+          if (clinic.latitude && clinic.longitude) {
+              const marker = L.marker([clinic.latitude, clinic.longitude], {
+                  icon: clinicIcon
+              }).addTo(currentMarkerLayer);
+
+              // Сохраняем ID клиники в маркере для поиска
+              marker.clinicId = clinic.id;
+
+              // Содержимое всплывающего окна
+              const specialtyNames = {
+                  'dental': 'Стоматология',
+                  'cardiology': 'Кардиология',
+                  'pediatrics': 'Педиатрия',
+                  'ophthalmology': 'Офтальмология',
+                  'neurology': 'Неврология'
+              };
+
+              const specialtyName = specialtyNames[clinic.specialty] || clinic.specialty || 'Общая';
+
+              const popupContent = `
+                  <div style="min-width: 220px;">
+                      <h4 style="margin: 0 0 8px; color: #667eea;">${clinic.name}</h4>
+                      <p style="margin: 5px 0;"><strong>📍 Адрес:</strong> ${clinic.address || 'Не указан'}</p>
+                      <p style="margin: 5px 0;"><strong>📞 Телефон:</strong> ${clinic.phone || 'Не указан'}</p>
+                      <p style="margin: 5px 0;"><strong>🏥 Специализация:</strong> ${specialtyName}</p>
+                      <hr style="margin: 10px 0;">
+                      <div style="display: flex; gap: 10px;">
+                          <a href="/clinics/${clinic.id}" style="color: #667eea; text-decoration: none;">📖 Подробнее →</a>
+                          <button onclick="getDirectionsToClinic(${clinic.latitude}, ${clinic.longitude}, '${clinic.name}')"
+                                  style="background: #4CAF50; padding: 5px 10px; font-size: 12px;">🗺️ Проложить маршрут</button>
+                      </div>
+                  </div>
+              `;
+
+              marker.bindPopup(popupContent);
+
+              // Обработчик клика по маркеру
+              marker.on('click', () => {
+                  highlightClinicInList(clinic.id);
+              });
+          }
+      });
+
+      // Обновляем список клиник в боковой панели
+      displayClinicList(clinics);
+  }
+
+  // Функция для отображения списка клиник
+  function displayClinicList(clinics) {
+      const clinicListDiv = document.getElementById('clinicList');
+      clinicListDiv.innerHTML = '';
+
+      if (clinics.length === 0) {
+          clinicListDiv.innerHTML = '<div style="padding: 20px; text-align: center;">Клиники не найдены</div>';
+          return;
+      }
+
+      clinics.forEach(clinic => {
+          const clinicDiv = document.createElement('div');
+          clinicDiv.className = 'clinic-item';
+          clinicDiv.setAttribute('data-id', clinic.id);
+          clinicDiv.onclick = () => {
+              // Центрируем карту на клинике
+              if (clinic.latitude && clinic.longitude) {
+                  map.setView([clinic.latitude, clinic.longitude], 16);
+                  // Находим и открываем попап маркера
+                  if (currentMarkerLayer) {
+                      let foundMarker = null;
+                      currentMarkerLayer.eachLayer(layer => {
+                          if (layer.clinicId === clinic.id) {
+                              foundMarker = layer;
+                          }
+                      });
+                      if (foundMarker) {
+                          foundMarker.openPopup();
+                      }
+                  }
+              }
+          };
+
+          const specialtyNames = {
+              'dental': 'Стоматология',
+              'cardiology': 'Кардиология',
+              'pediatrics': 'Педиатрия',
+              'ophthalmology': 'Офтальмология',
+              'neurology': 'Неврология'
+          };
+          const specialtyName = specialtyNames[clinic.specialty] || clinic.specialty || 'Общая';
+
+          clinicDiv.innerHTML = `
+              <h4>${clinic.name}</h4>
+              <p>📍 ${clinic.address || 'Адрес не указан'}</p>
+              <p>🏥 ${specialtyName}</p>
+              <p>📞 ${clinic.phone || 'Телефон не указан'}</p>
+          `;
+
+          clinicListDiv.appendChild(clinicDiv);
+      });
+  }
+
+  // Функция для прокладывания маршрута до клиники
+  window.getDirectionsToClinic = function(lat, lng, name) {
+      if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+              const userLat = position.coords.latitude;
+              const userLng = position.coords.longitude;
+
+              // Открываем маршрут в OpenStreetMap (или можно использовать OpenRouteService)
+              const url = `https://www.openstreetmap.org/directions?engine=graphhopper_foot&route=${userLat},${userLng}&to=${lat},${lng}`;
+              window.open(url, '_blank');
+
+              // Альтернативно, можно показать на текущей карте
+              // Для этого нужно интегрировать OpenRouteService API
+          }, function(error) {
+              alert('Не удалось определить ваше местоположение для построения маршрута');
+          });
+      } else {
+          alert('Геолокация не поддерживается');
+      }
+  };
+
+  // Подсветка клиники в списке
+  function highlightClinicInList(clinicId) {
+      const items = document.querySelectorAll('.clinic-item');
+      items.forEach(item => {
+          if (item.getAttribute('data-id') == clinicId) {
+              item.style.background = '#e0e7ff';
+              setTimeout(() => {
+                  item.style.background = '';
+              }, 2000);
+          }
+      });
+  }
+
+  // Фильтрация клиник
+  function filterClinics() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const specialty = document.getElementById('specialtyFilter').value;
+
+      let filtered = clinicsData;
+
+      // Фильтр по поиску
+      if (searchTerm) {
+          filtered = filtered.filter(clinic =>
+              clinic.name.toLowerCase().includes(searchTerm) ||
+              (clinic.address && clinic.address.toLowerCase().includes(searchTerm))
+          );
+      }
+
+      // Фильтр по специальности
+      if (specialty !== 'all') {
+          filtered = filtered.filter(clinic =>
+              clinic.specialty && clinic.specialty.toLowerCase() === specialty
+          );
+      }
+
+      displayClinics(filtered);
+  }
+
+  // Поиск ближайших клиник (используя API)
+  function findNearbyClinics() {
+      if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(async function(position) {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+
+              // Центрируем карту
+              map.setView([lat, lng], 13);
+
+              // Добавляем маркер пользователя (удаляем предыдущий, если есть)
+              if (window.userMarker) {
+                  map.removeLayer(window.userMarker);
+              }
+              window.userMarker = L.marker([lat, lng], {
+                  icon: L.divIcon({
+                      html: '📍',
+                      iconSize: [30, 30],
+                      className: 'user-marker'
+                  })
+              }).addTo(map);
+              window.userMarker.bindPopup('Вы здесь').openPopup();
+
+              // Здесь можно сделать запрос к API для получения ближайших клиник
+              // Пока просто показываем все клиники
+              displayClinics(clinicsData);
+
+              // Добавляем подсказку
+              const radius = 5; // км
+              const filtered = clinicsData.filter(clinic => {
+                  if (!clinic.latitude || !clinic.longitude) return false;
+                  const distance = calculateDistance(lat, lng, clinic.latitude, clinic.longitude);
+                  return distance <= radius;
+              });
+
+              if (filtered.length > 0) {
+                  displayClinics(filtered);
+              } else {
+                  alert(`В радиусе ${radius} км клиник не найдено`);
+              }
+
+          }, function(error) {
+              alert('Не удалось определить ваше местоположение');
+          });
+      } else {
+          alert('Геолокация не поддерживается');
+      }
+  }
+
+  // Функция для расчета расстояния между двумя точками (формула гаверсинуса)
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Радиус Земли в км
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+  }
+
+  // Показать все клиники
+  function showAllClinics() {
+      displayClinics(clinicsData);
+      document.getElementById('searchInput').value = '';
+      document.getElementById('specialtyFilter').value = 'all';
+  }
+
+  // Сброс вида карты
+  function resetView() {
+      map.setView([55.751244, 37.618423], 12);
+  }
+
+  // Добавляем обработчики событий
+  document.getElementById('searchInput').addEventListener('input', filterClinics);
+  document.getElementById('specialtyFilter').addEventListener('change', filterClinics);
+  document.getElementById('nearbyBtn').addEventListener('click', findNearbyClinics);
+  document.getElementById('resetViewBtn').addEventListener('click', resetView);
+  document.getElementById('allBtn').addEventListener('click', showAllClinics);
+
+  // Инициализация - отображаем все клиники
+  displayClinics(clinicsData);
+
+  // Добавляем масштаб
+  L.control.scale().addTo(map);
+
+  console.log('Карта загружена. Клиник найдено:', clinicsData.length);
+  console.log('Список клиник:', clinicsData);
+</script>
+</body>
+</html>
