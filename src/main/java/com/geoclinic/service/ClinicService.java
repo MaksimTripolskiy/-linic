@@ -25,4 +25,6 @@ public class ClinicService {
     public void createClinic(Clinic clinic) {
         clinicDAO.save(clinic);
     }
+
+    public void updateClinic(Clinic clinic) { clinicDAO.save(clinic); }     // todo
 }

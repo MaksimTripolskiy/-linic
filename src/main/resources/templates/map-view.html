@@ -211,6 +211,9 @@
         // Создаем новый слой для маркеров
         currentMarkerLayer = L.layerGroup().addTo(map);
 
+
+        console.log('clinic list:', clinics);
+
         // Добавляем маркеры для каждой клиники
         clinics.forEach(clinic => {
             if (clinic.latitude && clinic.longitude) {

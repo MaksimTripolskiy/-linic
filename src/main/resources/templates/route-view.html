@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenRouteService - Маршрут между точками A и B</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Leaflet Routing Machine (для отображения маршрута) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            pointer-events: auto;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .controls button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .controls .clear-btn {
+            background: #f44336;
+        }
+
+        .controls .clear-btn:hover {
+            background: #da190b;
+        }
+
+        .controls .route-btn {
+            background: #2196F3;
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            min-width: 250px;
+            pointer-events: none;
+        }
+
+        .info-panel h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
+        .info-panel .point-info {
+            margin: 10px 0;
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .info-panel .point-a {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .info-panel .point-b {
+            border-left: 4px solid #f44336;
+        }
+
+        .info-panel .route-info {
+            margin-top: 10px;
+            padding: 8px;
+            background: #e3f2fd;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .status {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<div class="info-panel">
+    <h3>🗺️ Маршрут A → B</h3>
+    <div class="point-info point-a" id="pointAInfo">
+        <strong>📍 Точка A (Старт):</strong><br>
+        Не выбрана
+    </div>
+    <div class="point-info point-b" id="pointBInfo">
+        <strong>📍 Точка B (Финиш):</strong><br>
+        Не выбрана
+    </div>
+    <div class="route-info" id="routeInfo" style="display:none;">
+        <strong>🚗 Информация о маршруте:</strong><br>
+        <span id="distanceInfo"></span><br>
+        <span id="durationInfo"></span>
+    </div>
+</div>
+
+<div class="controls">
+    <button id="setPointABtn" class="route-btn">📍 Установить точку A</button>
+    <button id="setPointBBtn" class="route-btn">🎯 Установить точку B</button>
+    <button id="calculateRouteBtn" disabled>🚗 Построить маршрут</button>
+    <button id="clearPointsBtn" class="clear-btn">🗑️ Очистить</button>
+</div>
+
+<div class="status" id="status">
+    💡 Режим: ожидание
+</div>
+
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+<script>
+    // OpenRouteService API ключ (получить бесплатно на https://openrouteservice.org/sign-up/)
+    const ORS_API_KEY = 'YOUR_OPENROUTESERVICE_API_KEY'; // Замените на ваш ключ
+    const ORS_ROUTE_URL = 'https://api.openrouteservice.org/v2/directions/driving-car/geojson';
+
+    // Инициализация карты (центр на Москве)
+    const map = L.map('map').setView([55.751244, 37.618423], 12);
+
+    // Добавляем слой карты
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Переменные для хранения точек
+    let pointA = null;  // { lat, lng }
+    let pointB = null;  // { lat, lng }
+    let markers = {
+        a: null,
+        b: null
+    };
+    let currentRoute = null;
+    let currentMode = null; // 'A' или 'B'
+
+    // Элементы UI
+    const pointAInfo = document.getElementById('pointAInfo');
+    const pointBInfo = document.getElementById('pointBInfo');
+    const routeInfo = document.getElementById('routeInfo');
+    const distanceInfo = document.getElementById('distanceInfo');
+    const durationInfo = document.getElementById('durationInfo');
+    const calculateBtn = document.getElementById('calculateRouteBtn');
+    const statusDiv = document.getElementById('status');
+
+    // Кастомные иконки для точек
+    const greenIcon = L.divIcon({
+        html: '<div style="background: #4CAF50; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>',
+        iconSize: [26, 26],
+        className: 'point-marker'
+    });
+
+    const redIcon = L.divIcon({
+        html: '<div style="background: #f44336; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>',
+        iconSize: [26, 26],
+        className: 'point-marker'
+    });
+
+    // Функция для установки точки A
+    function setPointA(lat, lng) {
+        pointA = { lat, lng };
+
+        // Удаляем старый маркер
+        if (markers.a) {
+            map.removeLayer(markers.a);
+        }
+
+        // Добавляем новый маркер
+        markers.a = L.marker([lat, lng], { icon: greenIcon })
+            .addTo(map)
+            .bindPopup('<b>Точка A (Старт)</b><br>Широта: ' + lat.toFixed(6) + '<br>Долгота: ' + lng.toFixed(6))
+            .openPopup();
+
+        // Обновляем информацию
+        pointAInfo.innerHTML = `<strong>📍 Точка A (Старт):</strong><br>
+                                 Широта: ${lat.toFixed(6)}<br>
+                                 Долгота: ${lng.toFixed(6)}`;
+
+        // Проверяем, можно ли построить маршрут
+        checkRouteReady();
+
+        updateStatus('Точка A установлена');
+    }
+
+    // Функция для установки точки B
+    function setPointB(lat, lng) {
+        pointB = { lat, lng };
+
+        // Удаляем старый маркер
+        if (markers.b) {
+            map.removeLayer(markers.b);
+        }
+
+        // Добавляем новый маркер
+        markers.b = L.marker([lat, lng], { icon: redIcon })
+            .addTo(map)
+            .bindPopup('<b>Точка B (Финиш)</b><br>Широта: ' + lat.toFixed(6) + '<br>Долгота: ' + lng.toFixed(6))
+            .openPopup();
+
+        // Обновляем информацию
+        pointBInfo.innerHTML = `<strong>📍 Точка B (Финиш):</strong><br>
+                                 Широта: ${lat.toFixed(6)}<br>
+                                 Долгота: ${lng.toFixed(6)}`;
+
+        // Проверяем, можно ли построить маршрут
+        checkRouteReady();
+
+        updateStatus('Точка B установлена');
+    }
+
+    // Проверка готовности к построению маршрута
+    function checkRouteReady() {
+        if (pointA && pointB) {
+            calculateBtn.disabled = false;
+            updateStatus('✅ Готов к построению маршрута. Нажмите "Построить маршрут"');
+        } else {
+            calculateBtn.disabled = true;
+        }
+    }
+
+    // Построение маршрута через OpenRouteService API
+    async function calculateRoute() {
+        if (!pointA || !pointB) {
+            alert('Пожалуйста, установите обе точки (A и B)');
+            return;
+        }
+
+        updateStatus('🔄 Построение маршрута...');
+        calculateBtn.disabled = true;
+
+        // OpenRouteService использует формат [longitude, latitude]
+        const start = [pointA.lng, pointA.lat];
+        const end = [pointB.lng, pointB.lat];
+
+        const requestBody = {
+            coordinates: [start, end],
+            preferences: 'fastest',
+            units: 'km',
+            language: 'ru'
+        };
+
+        try {
+            const response = await fetch(ORS_ROUTE_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': ORS_API_KEY
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // Удаляем старый маршрут
+            if (currentRoute) {
+                map.removeLayer(currentRoute);
+            }
+
+            // Извлекаем геометрию маршрута
+            const route = data.features[0].geometry;
+            const distance = data.features[0].properties.segments[0].distance;
+            const duration = data.features[0].properties.segments[0].duration;
+
+            // Отображаем маршрут на карте
+            currentRoute = L.geoJSON(route, {
+                style: {
+                    color: '#2196F3',
+                    weight: 6,
+                    opacity: 0.8
+                }
+            }).addTo(map);
+
+            // Показываем информацию о маршруте
+            const distanceKm = (distance / 1000).toFixed(2);
+            const durationMin = Math.round(duration / 60);
+            const durationHours = Math.floor(durationMin / 60);
+            const durationMinutes = durationMin % 60;
+
+            let durationText = '';
+            if (durationHours > 0) {
+                durationText = `${durationHours} ч ${durationMinutes} мин`;
+            } else {
+                durationText = `${durationMinutes} мин`;
+            }
+
+            distanceInfo.innerHTML = `📏 Расстояние: ${distanceKm} км`;
+            durationInfo.innerHTML = `⏱️ Время в пути: ${durationText}`;
+            routeInfo.style.display = 'block';
+
+            // Подгоняем карту под маршрут
+            const bounds = currentRoute.getBounds();
+            map.fitBounds(bounds);
+
+            updateStatus(`✅ Маршрут построен! Расстояние: ${distanceKm} км, время: ${durationText}`);
+
+        } catch (error) {
+            console.error('Ошибка:', error);
+            updateStatus('❌ Ошибка при построении маршрута. Проверьте API ключ');
+            alert('Ошибка при построении маршрута. Проверьте консоль и API ключ');
+        } finally {
+            calculateBtn.disabled = false;
+        }
+    }
+
+    // Очистка всех точек и маршрута
+    function clearAll() {
+        // Удаляем маркеры
+        if (markers.a) {
+            map.removeLayer(markers.a);
+            markers.a = null;
+        }
+        if (markers.b) {
+            map.removeLayer(markers.b);
+            markers.b = null;
+        }
+
+        // Удаляем маршрут
+        if (currentRoute) {
+            map.removeLayer(currentRoute);
+            currentRoute = null;
+        }
+
+        // Сбрасываем переменные
+        pointA = null;
+        pointB = null;
+
+        // Сбрасываем UI
+        pointAInfo.innerHTML = '<strong>📍 Точка A (Старт):</strong><br>Не выбрана';
+        pointBInfo.innerHTML = '<strong>📍 Точка B (Финиш):</strong><br>Не выбрана';
+        routeInfo.style.display = 'none';
+        calculateBtn.disabled = true;
+
+        updateStatus('🧹 Все точки и маршрут очищены');
+    }
+
+    // Обновление статуса
+    function updateStatus(message) {
+        statusDiv.innerHTML = `💡 ${message}`;
+        setTimeout(() => {
+            if (!pointA && !pointB) {
+                statusDiv.innerHTML = '💡 Режим: ожидание';
+            } else if (pointA && !pointB) {
+                statusDiv.innerHTML = '💡 Установите точку B';
+            } else if (!pointA && pointB) {
+                statusDiv.innerHTML = '💡 Установите точку A';
+            }
+        }, 3000);
+    }
+
+    // Обработчик кликов на карте в зависимости от режима
+    map.on('click', function(e) {
+        const { lat, lng } = e.latlng;
+
+        if (currentMode === 'A') {
+            setPointA(lat, lng);
+            currentMode = null;
+        } else if (currentMode === 'B') {
+            setPointB(lat, lng);
+            currentMode = null;
+        }
+    });
+
+    // Обработчики кнопок
+    document.getElementById('setPointABtn').addEventListener('click', () => {
+        currentMode = 'A';
+        updateStatus('Нажмите на карту для установки точки A (старт)');
+    });
+
+    document.getElementById('setPointBBtn').addEventListener('click', () => {
+        currentMode = 'B';
+        updateStatus('Нажмите на карту для установки точки B (финиш)');
+    });
+
+    document.getElementById('calculateRouteBtn').addEventListener('click', calculateRoute);
+    document.getElementById('clearPointsBtn').addEventListener('click', clearAll);
+
+    // Добавляем масштаб
+    L.control.scale().addTo(map);
+
+    // Добавляем примерные точки для демонстрации (Москва)
+    // Раскомментируйте для автоматической установки тестовых точек
+    /*
+    setTimeout(() => {
+        setPointA(55.751244, 37.618423);  // Кремль
+        setPointB(55.734768, 37.594497);  // Третьяковская галерея
+    }, 1000);
+    */
+
+    console.log('Карта готова! Используйте кнопки для установки точек A и B');
+</script>
+</body>
+</html>

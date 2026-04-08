@@ -1,4 +1,4 @@
-package com.geoclinic;
+package com.geoclinic.controller;
 
 import com.geoclinic.model.Clinic;
 import org.springframework.stereotype.Controller;

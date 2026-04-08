@@ -3,6 +3,7 @@ package com.geoclinic.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
 
 
 @Data
@@ -20,6 +21,9 @@ public class Clinic {
     private double latitude;
     @Column(name="longitude")
     private double longitude;
+
+
+    private List<Comment> comments;
 //    @OneToOne
 //    private Coordinates coordinates;
 
