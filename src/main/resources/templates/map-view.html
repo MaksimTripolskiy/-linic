@@ -177,9 +177,9 @@
 <!-- Leaflet JavaScript -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<script>
+<script th:inline="javascript">
     // Данные клиник из Spring Model
-    const clinicsData = /*[[${clinics}]]*/ [];
+    const clinicsData = JSON.parse(/*[[${clinicsJson}]]*/ '[]');
 
     // Инициализация карты
     const map = L.map('map').setView([55.751244, 37.618423], 12);
@@ -227,7 +227,7 @@
                         <h4 style="margin: 0 0 5px; color: #667eea;">${clinic.name}</h4>
                         <p style="margin: 5px 0;"><strong>📍 Адрес:</strong> ${clinic.address || 'Не указан'}</p>
                         <p style="margin: 5px 0;"><strong>📞 Телефон:</strong> ${clinic.phone || 'Не указан'}</p>
-                        <p style="margin: 5px 0;"><strong>🏥 Специализация:</strong> ${clinic.specialty || 'Общая'}</p>
+                        <p style="margin: 5px 0;"><strong>🏥 Специализация:</strong> ${clinic.type || 'Общая'}</p>
                         <hr style="margin: 10px 0;">
                         <a href="/clinics/${clinic.id}" style="color: #667eea;">Подробнее →</a>
                     </div>

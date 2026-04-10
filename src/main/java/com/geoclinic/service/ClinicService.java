@@ -15,6 +15,10 @@ public class ClinicService {
         this.clinicDAO = clinicDAO;
     }
 
+    public List<Clinic> getAllClinics() {
+        return clinicDAO.findAll();
+    }
+
     public List<Clinic> findClinics(String type) {
         List<Clinic> clinics =  clinicDAO.findAll();
         System.out.println(clinics);

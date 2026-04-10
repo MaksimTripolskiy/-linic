@@ -1,9 +1,11 @@
 package com.geoclinic.controller;
 
 import com.geoclinic.dto.RegistrationRequest;
+import com.geoclinic.model.Clinic;
 import com.geoclinic.service.ClinicService;
 import com.geoclinic.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,23 +13,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ClinicController {
 
-    @Autowired
+    @Autowired      // fixme
     private ClinicService clinicService;
     @Autowired
     private UserService userService;
 
 
-//    @GetMapping(value = "/getAllClinics")
-//    public String getAllClinics() {
-//        return clinicService.findClinics("dental").toString();
-//    }
+    @GetMapping(value = "/getAllClinics")
+    public String getAllClinics() {
+        return clinicService.getAllClinics().toString();
+    }
 
 
-//    @PostMapping(value = "/createClinic")
-//    public String createClinic(@RequestBody Clinic clinic) {
-//        clinicService.createClinic(clinic);
-//        return getAllClinics();
-//    }
+    @PostMapping(value = "/createClinic")
+    public String createClinic(@RequestBody Clinic clinic) {
+        clinicService.createClinic(clinic);
+        return getAllClinics();
+    }
 
     @PostMapping(value = "/registerUser")
     public String registerUser(@RequestBody RegistrationRequest request) {

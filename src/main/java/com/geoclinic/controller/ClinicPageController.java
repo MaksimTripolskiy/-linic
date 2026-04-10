@@ -1,16 +1,24 @@
 package com.geoclinic.controller;
 
 import com.geoclinic.model.Clinic;
+import com.geoclinic.service.ClinicService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Controller
 public class ClinicPageController {
 
+    private ClinicService clinicService;
+
+    public ClinicPageController(ClinicService clinicService) {
+        this.clinicService = clinicService;
+    }
 
     @GetMapping("/registerUser2")
     public String registerUser() {
@@ -24,13 +32,18 @@ public class ClinicPageController {
 
     }
 
-    @GetMapping(value = "/getAllClinics")
+    @GetMapping(value = "/page/getAllClinics")
     public String getAllClinics(Model model) {
-//        List<Clinic> clinicsList =  clinicService.findClinics("dental");
-        List<Clinic> clinicsList = new ArrayList<>();
-        clinicsList.add(new Clinic(55.755169,37.594524));
-        clinicsList.add(new Clinic(55.753263,37.594504));
-        model.addAttribute("clinics", clinicsList);
+        List<Clinic> clinicsList = clinicService.getAllClinics();
+
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String clinicsJson = mapper.writeValueAsString(clinicsList);
+        model.addAttribute("clinicsJson", clinicsJson);
+
+        System.out.println(clinicsJson);
+
         return "map-view";
 
     }
