@@ -11,6 +11,7 @@ import java.util.List;
 @Table(name="clinics")
 public class Clinic {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Автоматическая генерация
     @Column(name="id")
     private Long id;
     @Column(name="name")

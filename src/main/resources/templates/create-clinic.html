@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -93,7 +93,7 @@
 <div class="container">
     <h1>🏥 Clinic Information Form</h1>
 
-    <form id="clinicForm">
+    <form id="clinicForm" th:action="@{/createClinic}" th:method="post">
         <div class="form-group">
             <label for="clinicName">Clinic Name *</label>
             <input type="text" id="clinicName" name="name" required placeholder="Enter clinic name">
@@ -144,69 +144,71 @@
         <button type="submit">Submit Clinic Information</button>
     </form>
 
+    <div th:if="${message}" th:text="${message}" class="success"></div>
+    <div th:if="${error}" th:text="${error}" class="error"></div>
     <div id="result" class="result"></div>
 </div>
 
-<script>
-    document.getElementById('clinicForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+<!--<script>-->
+<!--    document.getElementById('clinicForm').addEventListener('submit', function(e) {-->
+<!--        e.preventDefault();-->
 
-        // Get form values
-        const clinicData = {
-            name: document.getElementById('clinicName').value,
-            address: document.getElementById('address').value,
-            city: document.getElementById('city').value,
-            phone: document.getElementById('phone').value,
-            email: document.getElementById('email').value,
-            type: document.getElementById('clinicType').value,
-            workingHours: document.getElementById('workingHours').value,
-            description: document.getElementById('description').value,
-            timestamp: new Date().toISOString()
-        };
+<!--        // Get form values-->
+<!--        const clinicData = {-->
+<!--            name: document.getElementById('clinicName').value,-->
+<!--            address: document.getElementById('address').value,-->
+<!--            city: document.getElementById('city').value,-->
+<!--            phone: document.getElementById('phone').value,-->
+<!--            email: document.getElementById('email').value,-->
+<!--            type: document.getElementById('clinicType').value,-->
+<!--            workingHours: document.getElementById('workingHours').value,-->
+<!--            description: document.getElementById('description').value,-->
+<!--            timestamp: new Date().toISOString()-->
+<!--        };-->
 
-        // Build GET URL with query parameters
-        const baseUrl = 'http://localhost:8080/api/clinics'; // Change this to your actual endpoint
-        const queryParams = new URLSearchParams(clinicData).toString();
-        const getUrl = `${baseUrl}?${queryParams}`;
+<!--        // Build GET URL with query parameters-->
+<!--        const baseUrl = 'http://localhost:8080/api/clinics'; // Change this to your actual endpoint-->
+<!--        const queryParams = new URLSearchParams(clinicData).toString();-->
+<!--        const getUrl = `${baseUrl}?${queryParams}`;-->
 
-        // Send GET request
-        fetch(getUrl, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            showResult('success', 'Clinic information sent successfully!');
-            console.log('Response:', data);
-            console.log('GET URL:', getUrl);
-        })
-        .catch(error => {
-            showResult('error', 'Error sending data: ' + error.message);
-            console.error('Error:', error);
-            console.log('Attempted GET URL:', getUrl);
-        });
-    });
+<!--        // Send GET request-->
+<!--        fetch(getUrl, {-->
+<!--            method: 'GET',-->
+<!--            headers: {-->
+<!--                'Accept': 'application/json',-->
+<!--            }-->
+<!--        })-->
+<!--        .then(response => {-->
+<!--            if (!response.ok) {-->
+<!--                throw new Error('Network response was not ok');-->
+<!--            }-->
+<!--            return response.json();-->
+<!--        })-->
+<!--        .then(data => {-->
+<!--            showResult('success', 'Clinic information sent successfully!');-->
+<!--            console.log('Response:', data);-->
+<!--            console.log('GET URL:', getUrl);-->
+<!--        })-->
+<!--        .catch(error => {-->
+<!--            showResult('error', 'Error sending data: ' + error.message);-->
+<!--            console.error('Error:', error);-->
+<!--            console.log('Attempted GET URL:', getUrl);-->
+<!--        });-->
+<!--    });-->
 
-    function showResult(type, message) {
-        const resultDiv = document.getElementById('result');
-        resultDiv.className = 'result ' + type;
-        resultDiv.textContent = message;
+<!--    function showResult(type, message) {-->
+<!--        const resultDiv = document.getElementById('result');-->
+<!--        resultDiv.className = 'result ' + type;-->
+<!--        resultDiv.textContent = message;-->
 
-        // Scroll to result
-        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+<!--        // Scroll to result-->
+<!--        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });-->
 
-        // Hide after 5 seconds
-        setTimeout(() => {
-            resultDiv.className = 'result';
-        }, 5000);
-    }
-</script>
+<!--        // Hide after 5 seconds-->
+<!--        setTimeout(() => {-->
+<!--            resultDiv.className = 'result';-->
+<!--        }, 5000);-->
+<!--    }-->
+<!--</script>-->
 </body>
 </html>

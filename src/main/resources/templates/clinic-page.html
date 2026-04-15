@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Медицинский центр «Здоровье+» | Отзывы пациентов</title>
+    <!-- Google Fonts и Font Awesome для иконок -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f7fc;
+            color: #1a2c3e;
+            line-height: 1.5;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        /* Шапка и основная информация */
+        .hero {
+            background: linear-gradient(135deg, #0b4f6c 0%, #1b7f9e 100%);
+            padding: 2.5rem 2rem;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hero h1 i {
+            font-size: 2rem;
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 60%;
+        }
+
+        .rating-badge {
+            background: rgba(255,215,0,0.2);
+            backdrop-filter: blur(4px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-weight: 500;
+            margin-top: 12px;
+            font-size: 0.95rem;
+        }
+
+        .rating-badge i {
+            color: #ffcd4a;
+        }
+
+        .info-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 1.8rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .info-card {
+            flex: 1;
+            min-width: 180px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .info-card i {
+            font-size: 1.8rem;
+            opacity: 0.9;
+        }
+
+        .info-card div p:first-child {
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+
+        .info-card div p:last-child {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* два блока: отзывы и форма */
+        .main-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .reviews-section {
+            flex: 2;
+            min-width: 260px;
+        }
+
+        .form-section {
+            flex: 1.2;
+            min-width: 280px;
+            background: #f9fafc;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            align-self: start;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            border: 1px solid #e9edf2;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 5px solid #1b7f9e;
+            padding-left: 1rem;
+        }
+
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 1.8rem;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .review-card {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid #eef2f6;
+            transition: all 0.2s;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .reviewer-name {
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reviewer-name i {
+            color: #1b7f9e;
+            font-size: 0.9rem;
+        }
+
+        .review-stars {
+            color: #f5b042;
+            letter-spacing: 2px;
+            font-size: 0.85rem;
+        }
+
+        .review-date {
+            font-size: 0.7rem;
+            color: #7c8b9c;
+            margin-top: 4px;
+        }
+
+        .review-text {
+            margin-top: 10px;
+            color: #2c3e4e;
+            line-height: 1.45;
+            font-size: 0.95rem;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 2rem;
+            background: #fef9e6;
+            border-radius: 1rem;
+        }
+
+        /* Форма */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: #1f3b4a;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #dce3ea;
+            border-radius: 1rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #1b7f9e;
+            box-shadow: 0 0 0 3px rgba(27,127,158,0.2);
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 10px;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 1.6rem;
+            color: #cfdde6;
+            cursor: pointer;
+            transition: 0.1s;
+            margin-bottom: 0;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: #f5b042;
+        }
+
+        .star-rating-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-submit {
+            background: #0b4f6c;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 0.9rem;
+            font-weight: 600;
+            border-radius: 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            background: #0a4058;
+            transform: scale(0.98);
+        }
+
+        .toast-msg {
+            background: #2e7d64;
+            color: white;
+            padding: 10px;
+            border-radius: 40px;
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border-color: #e2e8f0;
+        }
+
+        footer {
+            background: #f1f5f9;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.8rem;
+            color: #4b6a7f;
+            border-top: 1px solid #e2edf2;
+        }
+
+        @media (max-width: 750px) {
+            .hero h1 { font-size: 1.6rem; }
+            .main-layout { padding: 1.2rem; }
+            .section-title { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Блок информации о клинике -->
+    <div class="hero">
+        <h1>
+            <i class="fas fa-hospital-user"></i>
+            Медицинский центр «Здоровье+»
+        </h1>
+        <div class="rating-badge">
+            <i class="fas fa-star"></i>
+            <span id="avgRatingDisplay">4.8</span> ★
+            <span id="reviewsCountDisplay">(12 отзывов)</span>
+        </div>
+        <div class="info-grid">
+            <div class="info-card">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                    <p>Адрес</p>
+                    <p>г. Москва, ул. Медиков, 12</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-clock"></i>
+                <div>
+                    <p>Режим работы</p>
+                    <p>Пн-Вс: 08:00 – 21:00</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-stethoscope"></i>
+                <div>
+                    <p>Направления</p>
+                    <p>Терапия, Кардиология, Неврология</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-phone-alt"></i>
+                <div>
+                    <p>Телефон</p>
+                    <p>+7 (495) 123-45-67</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <!-- Список отзывов -->
+        <div class="reviews-section">
+            <div class="section-title">
+                <i class="fas fa-comments"></i>
+                Отзывы пациентов
+            </div>
+            <div id="reviewsListContainer" class="reviews-list">
+                <!-- динамические отзывы будут вставлены сюда через JS -->
+            </div>
+        </div>
+
+        <!-- Форма добавления отзыва -->
+        <div class="form-section">
+            <div class="section-title" style="border-left-color: #f5b042; font-size: 1.3rem;">
+                <i class="fas fa-pen-alt"></i>
+                Оставить отзыв
+            </div>
+            <form id="reviewForm">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Ваше имя</label>
+                    <input type="text" id="userName" placeholder="Например: Анна П." required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-star"></i> Оценка</label>
+                    <div class="star-rating-wrapper">
+                        <div class="star-rating" id="starRatingWidget">
+                            <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="Отлично">★</label>
+                            <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="Хорошо">★</label>
+                            <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="Удовлетворительно">★</label>
+                            <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="Плохо">★</label>
+                            <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="Ужасно">★</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-comment-dots"></i> Текст отзыва</label>
+                    <textarea id="reviewText" rows="4" placeholder="Поделитесь впечатлением о клинике..." required></textarea>
+                </div>
+                <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> Отправить отзыв</button>
+                <div id="formFeedback" class="toast-msg"></div>
+            </form>
+            <hr>
+            <div style="font-size: 0.75rem; color: #5a6e7c; text-align: center;">
+                <i class="fas fa-shield-alt"></i> Все отзывы проходят модерацию (демо-режим)
+            </div>
+        </div>
+    </div>
+    <footer>
+        <i class="fas fa-heartbeat"></i> Лицензия ЛО-77-01-123456 | Современные технологии заботы о вашем здоровье
+    </footer>
+</div>
+
+<script>
+    // ---------- Начальные данные (примеры отзывов) ----------
+    let reviews = [
+        {
+            id: "rev1",
+            name: "Екатерина Смирнова",
+            rating: 5,
+            text: "Очень внимательные врачи! Прошла полное обследование, всё четко и комфортно. Клиника светлая, современное оборудование. Рекомендую!",
+            date: "2025-02-18T10:30:00"
+        },
+        {
+            id: "rev2",
+            name: "Алексей Королёв",
+            rating: 4,
+            text: "Хороший центр, запись по записи, очередей нет. Кардиолог очень грамотный. Минус один — цены чуть выше среднего, но качество того стоит.",
+            date: "2025-02-10T14:20:00"
+        },
+        {
+            id: "rev3",
+            name: "Мария Тихонова",
+            rating: 5,
+            text: "Лучшая клиника в районе! Дочку привела на прививку — всё аккуратно, без стресса. Персонал вежливый, спасибо большое!",
+            date: "2025-02-05T09:15:00"
+        },
+        {
+            id: "rev4",
+            name: "Игорь Петров",
+            rating: 3,
+            text: "Нормальная клиника, но на ресепшене иногда долго оформляют. Врач толковый, лечение помогло. Надеюсь, улучшат сервис.",
+            date: "2025-01-28T16:45:00"
+        }
+    ];
+
+    // Вспомогательные функции
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const day = date.getDate().toString().padStart(2,'0');
+        const month = (date.getMonth()+1).toString().padStart(2,'0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
+    }
+
+    // Рендер отзывов
+    function renderReviews() {
+        const container = document.getElementById('reviewsListContainer');
+        if (!container) return;
+
+        if (reviews.length === 0) {
+            container.innerHTML = `<div class="empty-message"><i class="far fa-frown"></i> Пока нет отзывов. Будьте первым, кто оставит отзыв!</div>`;
+            updateStats();
+            return;
+        }
+
+        // Сортируем по дате (новые сверху)
+        const sorted = [...reviews].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        let html = '';
+        sorted.forEach(rev => {
+            // звезды
+            let starsHtml = '';
+            for (let i=1; i<=5; i++) {
+                starsHtml += i <= rev.rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+            }
+            html += `
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-name"><i class="fas fa-user-circle"></i> ${escapeHtml(rev.name)}</div>
+                        <div class="review-stars">${starsHtml}</div>
+                    </div>
+                    <div class="review-date"><i class="far fa-calendar-alt"></i> ${formatDate(rev.date)}</div>
+                    <div class="review-text">${escapeHtml(rev.text)}</div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        updateStats();
+    }
+
+    // обновление средней оценки и количества отзывов в шапке
+    function updateStats() {
+        const count = reviews.length;
+        if (count === 0) {
+            document.getElementById('avgRatingDisplay').innerText = '0.0';
+            document.getElementById('reviewsCountDisplay').innerText = '(0 отзывов)';
+            return;
+        }
+        let sum = 0;
+        reviews.forEach(r => sum += r.rating);
+        const avg = (sum / count).toFixed(1);
+        document.getElementById('avgRatingDisplay').innerText = avg;
+        document.getElementById('reviewsCountDisplay').innerText = `(${count} ${getDeclension(count, 'отзыв', 'отзыва', 'отзывов')})`;
+    }
+
+    function getDeclension(n, one, two, five) {
+        n = Math.abs(n) % 100;
+        if (n >= 5 && n <= 20) return five;
+        n %= 10;
+        if (n === 1) return one;
+        if (n >= 2 && n <= 4) return two;
+        return five;
+    }
+
+    // простой escape для защиты от XSS
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    // Добавление нового отзыва
+    function addReview(name, rating, text) {
+        if (!name.trim() || !text.trim()) {
+            showFormFeedback('Пожалуйста, заполните имя и текст отзыва.', 'error');
+            return false;
+        }
+        if (!rating || rating < 1 || rating > 5) {
+            showFormFeedback('Пожалуйста, выберите оценку (от 1 до 5 звезд).', 'error');
+            return false;
+        }
+
+        const newReview = {
+            id: Date.now().toString(),
+            name: name.trim(),
+            rating: parseInt(rating),
+            text: text.trim(),
+            date: new Date().toISOString()
+        };
+        reviews.unshift(newReview); // добавляем в начало (новый сверху)
+        renderReviews();  // перерисовываем список
+
+        // очистка формы
+        document.getElementById('userName').value = '';
+        document.getElementById('reviewText').value = '';
+        // сброс звёзд radio
+        const radioButtons = document.querySelectorAll('input[name="rating"]');
+        radioButtons.forEach(rb => rb.checked = false);
+
+        showFormFeedback('Спасибо! Ваш отзыв добавлен.', 'success');
+        // плавный скролл к началу списка отзывов
+        const reviewsContainer = document.querySelector('.reviews-section');
+        if (reviewsContainer) reviewsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return true;
+    }
+
+    function showFormFeedback(msg, type) {
+        const feedbackDiv = document.getElementById('formFeedback');
+        if (!feedbackDiv) return;
+        feedbackDiv.style.opacity = '1';
+        feedbackDiv.style.backgroundColor = type === 'success' ? '#2e7d64' : '#b33b2c';
+        feedbackDiv.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+        setTimeout(() => {
+            feedbackDiv.style.opacity = '0';
+        }, 3500);
+    }
+
+    // обработка отправки формы
+    document.getElementById('reviewForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('userName').value;
+        const text = document.getElementById('reviewText').value;
+        let rating = null;
+        const selectedRating = document.querySelector('input[name="rating"]:checked');
+        if (selectedRating) rating = selectedRating.value;
+        addReview(name, rating, text);
+    });
+
+    // инициализация страницы: рендер отзывов
+    renderReviews();
+
+    // дополнительно: добавим поддержку клика по звёздам для удобства
+    // уже работает через label, но создадим также hover-эффект через CSS (уже есть)
+    // небольшой фикс: для корректного отображения рейтинга в форме (пусть показывается значение)
+    // также можно сделать предустановленный пример
+</script>
+</body>
+</html>

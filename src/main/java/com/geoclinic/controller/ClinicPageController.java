@@ -5,6 +5,8 @@ import com.geoclinic.service.ClinicService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
@@ -30,6 +32,18 @@ public class ClinicPageController {
     public String getCreateClinicPage() {
         return "create-clinic";
 
+    }
+
+    @PostMapping("/createClinic")
+    public String createClinic(@ModelAttribute Clinic clinic, Model model) {
+        try {
+            // Сохранить клинику
+            clinicService.createClinic(clinic);
+            model.addAttribute("message", "Clinic created successfully!");
+        } catch (Exception e) {
+            model.addAttribute("error", "Error: " + e.getMessage());
+        }
+        return "create-clinic"; // вернуть ту же страницу с сообщением
     }
 
     @GetMapping(value = "/page/getAllClinics")

@@ -1,0 +1,643 @@
+Вот код страницы для модерации отзывов — со списком ожидающих подтверждения комментариев и кнопками одобрения/отклонения.
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Модерация отзывов | Панель управления</title>
+  <!-- Google Fonts + Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: #eef2f7;
+        padding: 2rem 1rem;
+        color: #1e2f3e;
+    }
+
+    .container {
+        max-width: 1300px;
+        margin: 0 auto;
+    }
+
+    /* Header */
+    .admin-header {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 1.5rem 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #e2edf2;
+    }
+
+    .title-section h1 {
+        font-size: 1.7rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #0b4f6c;
+    }
+
+    .title-section p {
+        color: #5a6e7c;
+        margin-top: 6px;
+        font-size: 0.85rem;
+    }
+
+    .stats-badge {
+        background: #f0f4f9;
+        padding: 0.6rem 1.2rem;
+        border-radius: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+    }
+
+    .stats-badge i {
+        font-size: 1.3rem;
+        color: #e67e22;
+    }
+
+    .pending-count {
+        background: #e67e22;
+        color: white;
+        border-radius: 40px;
+        padding: 0.2rem 0.7rem;
+        font-weight: 700;
+        margin-left: 6px;
+    }
+
+    /* Основная сетка */
+    .moderation-panel {
+        background: white;
+        border-radius: 1.8rem;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.05);
+        overflow: hidden;
+        border: 1px solid #e9edf2;
+    }
+
+    .panel-tabs {
+        display: flex;
+        border-bottom: 1px solid #eef2f8;
+        background: #fafcff;
+        padding: 0 1.5rem;
+    }
+
+    .tab {
+        padding: 1rem 1.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        border-bottom: 3px solid transparent;
+        color: #5c6f87;
+    }
+
+    .tab.active {
+        color: #0b4f6c;
+        border-bottom-color: #0b4f6c;
+        background: rgba(11,79,108,0.02);
+    }
+
+    .tab i {
+        margin-right: 8px;
+    }
+
+    .comments-list {
+        padding: 1.8rem;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    /* Карточка комментария */
+    .comment-card {
+        background: #ffffff;
+        border: 1px solid #eef2f6;
+        border-radius: 1.2rem;
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 1.2rem;
+        transition: all 0.2s;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .comment-card.pending {
+        border-left: 5px solid #f39c12;
+        background: #fffef7;
+    }
+
+    .comment-card.approved {
+        border-left: 5px solid #27ae60;
+        opacity: 0.85;
+    }
+
+    .comment-card.rejected {
+        border-left: 5px solid #e74c3c;
+        background: #fef6f5;
+        opacity: 0.8;
+    }
+
+    .comment-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 12px;
+    }
+
+    .comment-author {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .author-name {
+        font-weight: 700;
+        font-size: 1rem;
+        background: #eef2fa;
+        padding: 0.2rem 0.9rem;
+        border-radius: 40px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .rating-stars {
+        color: #f5b042;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+    }
+
+    .comment-date {
+        font-size: 0.7rem;
+        color: #7e8c9e;
+    }
+
+    .comment-text {
+        margin: 12px 0 12px 0;
+        line-height: 1.5;
+        color: #2c3e4e;
+        background: #fafbfd;
+        padding: 0.8rem 1rem;
+        border-radius: 1rem;
+    }
+
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.7rem;
+        border-radius: 30px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-pending {
+        background: #fef2e0;
+        color: #c47a1a;
+    }
+
+    .status-approved {
+        background: #e0f7e8;
+        color: #1f7840;
+    }
+
+    .status-rejected {
+        background: #ffe6e5;
+        color: #bc3f31;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-approve, .btn-reject {
+        border: none;
+        padding: 0.5rem 1.2rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 0.8rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+    }
+
+    .btn-approve {
+        background: #27ae60;
+        color: white;
+    }
+
+    .btn-approve:hover {
+        background: #219653;
+        transform: scale(0.96);
+    }
+
+    .btn-reject {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .btn-reject:hover {
+        background: #c0392b;
+        transform: scale(0.96);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: #f9fafc;
+        border-radius: 1.5rem;
+        color: #7f8c8d;
+    }
+
+    .filter-bar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .filter-group {
+        display: flex;
+        gap: 8px;
+        background: #f1f5f9;
+        padding: 0.3rem;
+        border-radius: 2rem;
+    }
+
+    .filter-btn {
+        background: transparent;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.1s;
+    }
+
+    .filter-btn.active-filter {
+        background: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        color: #0b4f6c;
+    }
+
+    footer {
+        margin-top: 2rem;
+        text-align: center;
+        font-size: 0.75rem;
+        color: #6c8196;
+    }
+
+    @media (max-width: 680px) {
+        .admin-header { flex-direction: column; align-items: start; gap: 12px; }
+        .comment-header { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Верхняя панель -->
+  <div class="admin-header">
+    <div class="title-section">
+      <h1><i class="fas fa-clipboard-list"></i> Модерация отзывов</h1>
+      <p>Управление комментариями из базы данных (ожидают подтверждения / одобрены / отклонены)</p>
+    </div>
+    <div class="stats-badge">
+      <i class="fas fa-clock"></i>
+      <span>Ожидают модерации: <strong id="pendingTotalCount">0</strong></span>
+    </div>
+  </div>
+
+  <div class="moderation-panel">
+    <div class="panel-tabs">
+      <div class="tab active" data-filter="all"><i class="fas fa-list-ul"></i> Все отзывы</div>
+      <div class="tab" data-filter="pending"><i class="fas fa-hourglass-half"></i> На проверке</div>
+      <div class="tab" data-filter="approved"><i class="fas fa-check-circle"></i> Одобренные</div>
+      <div class="tab" data-filter="rejected"><i class="fas fa-times-circle"></i> Отклоненные</div>
+    </div>
+
+    <div class="comments-list">
+      <div class="filter-bar">
+        <div class="filter-group" id="quickStatusFilter">
+          <button class="filter-btn active-filter" data-status="all">Все</button>
+          <button class="filter-btn" data-status="pending">Ожидают</button>
+          <button class="filter-btn" data-status="approved">Одобрены</button>
+          <button class="filter-btn" data-status="rejected">Отклонены</button>
+        </div>
+        <div><i class="fas fa-database"></i> <span id="resultCount">0</span> записей</div>
+      </div>
+      <div id="commentsContainer">
+        <!-- Динамически загружаемые карточки комментариев -->
+        <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Загрузка данных...</div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <i class="fas fa-shield-alt"></i> Симуляция работы с базой данных (localStorage + массив). Все изменения сохраняются.
+  </footer>
+</div>
+
+<script>
+  // ---------- Имитация базы данных: массив комментариев со статусами ----------
+  // Структура: id, author, rating, text, createdAt, status ('pending', 'approved', 'rejected')
+  let commentsDB = [];
+
+  // Функция загрузки начальных данных (как будто из БД)
+  function loadInitialData() {
+      // Попытка загрузить из localStorage, если нет — создаем демо-данные
+      const stored = localStorage.getItem('moderation_comments_db');
+      if (stored) {
+          commentsDB = JSON.parse(stored);
+      } else {
+          // Демо-комментарии (некоторые уже в статусе pending для модерации)
+          commentsDB = [
+              {
+                  id: "c1",
+                  author: "Анна Коваленко",
+                  rating: 5,
+                  text: "Отличная клиника! Врачи профессионалы, записалась быстро, все прошло замечательно. Огромное спасибо!",
+                  createdAt: "2026-04-10T11:20:00",
+                  status: "pending"
+              },
+              {
+                  id: "c2",
+                  author: "Дмитрий Орлов",
+                  rating: 2,
+                  text: "Долго ждал приема, персонал на ресепшене грубоват. Врач нормальный, но атмосфера не очень.",
+                  createdAt: "2026-04-09T15:45:00",
+                  status: "pending"
+              },
+              {
+                  id: "c3",
+                  author: "Елена Морозова",
+                  rating: 4,
+                  text: "Хороший медцентр. Современное оборудование, анализы сделали быстро. Рекомендую, но цены кусаются.",
+                  createdAt: "2026-04-08T09:10:00",
+                  status: "approved"
+              },
+              {
+                  id: "c4",
+                  author: "Игорь Степанов",
+                  rating: 1,
+                  text: "Ужасная организация! Не советую, потерял время и нервы.",
+                  createdAt: "2026-04-07T18:30:00",
+                  status: "rejected"
+              },
+              {
+                  id: "c5",
+                  author: "Ольга Федорова",
+                  rating: 5,
+                  text: "Лучшее место для всей семьи. Детский невролог — золото. Спасибо докторам!",
+                  createdAt: "2026-04-11T08:20:00",
+                  status: "pending"
+              },
+              {
+                  id: "c6",
+                  author: "Максим Власов",
+                  rating: 3,
+                  text: "Нормально, но бывало и лучше. Терапевт внимательный, однако долго выдают карту.",
+                  createdAt: "2026-04-06T12:15:00",
+                  status: "approved"
+              },
+              {
+                  id: "c7",
+                  author: "Татьяна Лисицына",
+                  rating: 4,
+                  text: "Чисто, уютно, вежливый персонал. Сдавала анализы - результат пришел быстро.",
+                  createdAt: "2026-04-05T14:40:00",
+                  status: "rejected"
+              }
+          ];
+          persistToLocalStorage();
+      }
+      renderCurrentView();
+  }
+
+  // Сохранение в localStorage (имитация БД)
+  function persistToLocalStorage() {
+      localStorage.setItem('moderation_comments_db', JSON.stringify(commentsDB));
+  }
+
+  // Обновить количество ожидающих в шапке
+  function updatePendingCount() {
+      const pendingCount = commentsDB.filter(c => c.status === 'pending').length;
+      document.getElementById('pendingTotalCount').innerText = pendingCount;
+  }
+
+  // Изменить статус комментария (approve / reject)
+  function moderateComment(commentId, newStatus) {
+      const comment = commentsDB.find(c => c.id === commentId);
+      if (!comment) return;
+      if (comment.status === newStatus) return;
+      comment.status = newStatus;
+      persistToLocalStorage();
+      renderCurrentView();   // перерисовываем с текущим фильтром
+      updatePendingCount();
+      showToast(newStatus === 'approved' ? 'Отзыв одобрен ✓' : 'Отзыв отклонен ✗');
+  }
+
+  // Вспомогательная функция для красивого формата даты
+  function formatDate(isoString) {
+      const date = new Date(isoString);
+      return date.toLocaleDateString('ru-RU', { day:'numeric', month:'long', year:'numeric' }) + ' ' +
+             date.toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' });
+  }
+
+  // Рендер звездного рейтинга
+  function renderStars(rating) {
+      let stars = '';
+      for (let i=1; i<=5; i++) {
+          stars += i <= rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+      }
+      return `<span class="rating-stars">${stars}</span>`;
+  }
+
+  // Получение статусного бейджа
+  function getStatusBadge(status) {
+      if (status === 'pending') return '<span class="status-badge status-pending"><i class="fas fa-hourglass-half"></i> На модерации</span>';
+      if (status === 'approved') return '<span class="status-badge status-approved"><i class="fas fa-check-circle"></i> Одобрен</span>';
+      return '<span class="status-badge status-rejected"><i class="fas fa-ban"></i> Отклонен</span>';
+  }
+
+  // Текущие фильтры (вкладка + кнопки)
+  let currentFilter = 'all';   // 'all', 'pending', 'approved', 'rejected'
+
+  function setFilter(filter) {
+      currentFilter = filter;
+      // синхронизируем активные классы вкладок и кнопок
+      document.querySelectorAll('.tab').forEach(tab => {
+          const tabFilter = tab.getAttribute('data-filter');
+          if ((filter === 'all' && tabFilter === 'all') || tabFilter === filter) {
+              tab.classList.add('active');
+          } else {
+              tab.classList.remove('active');
+          }
+      });
+      document.querySelectorAll('#quickStatusFilter .filter-btn').forEach(btn => {
+          const btnFilter = btn.getAttribute('data-status');
+          if (btnFilter === filter) btn.classList.add('active-filter');
+          else btn.classList.remove('active-filter');
+      });
+      renderCurrentView();
+  }
+
+  function renderCurrentView() {
+      const container = document.getElementById('commentsContainer');
+      if (!container) return;
+
+      let filteredComments = [];
+      if (currentFilter === 'all') {
+          filteredComments = [...commentsDB];
+      } else {
+          filteredComments = commentsDB.filter(c => c.status === currentFilter);
+      }
+
+      // сортируем по дате (новые сверху)
+      filteredComments.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      if (filteredComments.length === 0) {
+          container.innerHTML = `<div class="empty-state"><i class="far fa-comment-dots"></i> Нет комментариев в этой категории</div>`;
+          document.getElementById('resultCount').innerText = '0';
+          return;
+      }
+
+      let html = '';
+      filteredComments.forEach(comment => {
+          const statusClass = comment.status;
+          html += `
+              <div class="comment-card ${statusClass}" data-id="${comment.id}">
+                  <div class="comment-header">
+                      <div class="comment-author">
+                          <span class="author-name"><i class="fas fa-user-md"></i> ${escapeHtml(comment.author)}</span>
+                          ${renderStars(comment.rating)}
+                          ${getStatusBadge(comment.status)}
+                      </div>
+                      <div class="comment-date"><i class="far fa-calendar-alt"></i> ${formatDate(comment.createdAt)}</div>
+                  </div>
+                  <div class="comment-text">
+                      <i class="fas fa-quote-left" style="color:#b9cadb; margin-right:6px;"></i>
+                      ${escapeHtml(comment.text)}
+                  </div>
+          `;
+          // Кнопки управления — только для отзывов со статусом pending (ожидают)
+          if (comment.status === 'pending') {
+              html += `
+                  <div class="action-buttons">
+                      <button class="btn-approve" data-id="${comment.id}" data-action="approve"><i class="fas fa-thumbs-up"></i> Одобрить</button>
+                      <button class="btn-reject" data-id="${comment.id}" data-action="reject"><i class="fas fa-thumbs-down"></i> Отклонить</button>
+                  </div>
+              `;
+          } else {
+              // Для уже обработанных можно показать информационную метку
+              html += `<div style="margin-top:10px; font-size:0.7rem; color:#8d9aab;"><i class="fas fa-info-circle"></i>
+                  ${comment.status === 'approved' ? 'Отзыв опубликован на сайте' : 'Отзыв отклонен и не отображается'}
+              </div>`;
+          }
+          html += `</div>`;
+      });
+      container.innerHTML = html;
+      document.getElementById('resultCount').innerText = filteredComments.length;
+
+      // Привязываем события к кнопкам после рендера
+      document.querySelectorAll('.btn-approve').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const id = btn.getAttribute('data-id');
+              if (id) moderateComment(id, 'approved');
+          });
+      });
+      document.querySelectorAll('.btn-reject').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const id = btn.getAttribute('data-id');
+              if (id) moderateComment(id, 'rejected');
+          });
+      });
+  }
+
+  // утилита для экранирования HTML
+  function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+          if (m === '&') return '&amp;';
+          if (m === '<') return '&lt;';
+          if (m === '>') return '&gt;';
+          return m;
+      });
+  }
+
+  // уведомление (простой тост)
+  function showToast(message, isError = false) {
+      // создаем временный тост
+      const toast = document.createElement('div');
+      toast.innerText = message;
+      toast.style.position = 'fixed';
+      toast.style.bottom = '20px';
+      toast.style.right = '20px';
+      toast.style.backgroundColor = isError ? '#e74c3c' : '#2c7a4b';
+      toast.style.color = 'white';
+      toast.style.padding = '12px 24px';
+      toast.style.borderRadius = '40px';
+      toast.style.fontWeight = '500';
+      toast.style.zIndex = '9999';
+      toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+      toast.style.fontSize = '0.9rem';
+      document.body.appendChild(toast);
+      setTimeout(() => {
+          toast.style.opacity = '0';
+          setTimeout(() => toast.remove(), 300);
+      }, 2000);
+  }
+
+  // Инициализация переключения вкладок
+  function bindTabs() {
+      document.querySelectorAll('.tab').forEach(tab => {
+          tab.addEventListener('click', (e) => {
+              const filterVal = tab.getAttribute('data-filter');
+              if (filterVal === 'all') setFilter('all');
+              else if (filterVal === 'pending') setFilter('pending');
+              else if (filterVal === 'approved') setFilter('approved');
+              else if (filterVal === 'rejected') setFilter('rejected');
+          });
+      });
+      document.querySelectorAll('#quickStatusFilter .filter-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+              const status = btn.getAttribute('data-status');
+              if (status === 'all') setFilter('all');
+              else if (status === 'pending') setFilter('pending');
+              else if (status === 'approved') setFilter('approved');
+              else if (status === 'rejected') setFilter('rejected');
+          });
+      });
+  }
+
+  // запуск
+  function init() {
+      loadInitialData();
+      bindTabs();
+      updatePendingCount();
+  }
+
+  init();
+</script>
+</body>
+</html>
+```

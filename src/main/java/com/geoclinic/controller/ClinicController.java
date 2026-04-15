@@ -25,11 +25,12 @@ public class ClinicController {
     }
 
 
-    @PostMapping(value = "/createClinic")
-    public String createClinic(@RequestBody Clinic clinic) {
-        clinicService.createClinic(clinic);
-        return getAllClinics();
-    }
+//    @PostMapping(value = "/createClinic")
+//    public String createClinic(@RequestBody Clinic clinic) {
+//        clinicService.createClinic(clinic);
+//        return getAllClinics();
+//    }
+
 
     @PostMapping(value = "/registerUser")
     public String registerUser(@RequestBody RegistrationRequest request) {
