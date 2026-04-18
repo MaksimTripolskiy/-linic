@@ -30,7 +30,7 @@ public class ClinicPageController {
 
     @GetMapping("/createClinic")
     public String getCreateClinicPage() {
-        return "create-clinic";
+        return "create-clinic-map";
 
     }
 
@@ -43,7 +43,7 @@ public class ClinicPageController {
         } catch (Exception e) {
             model.addAttribute("error", "Error: " + e.getMessage());
         }
-        return "create-clinic"; // вернуть ту же страницу с сообщением
+        return "create-clinic-map"; // вернуть ту же страницу с сообщением
     }
 
     @GetMapping(value = "/page/getAllClinics")
