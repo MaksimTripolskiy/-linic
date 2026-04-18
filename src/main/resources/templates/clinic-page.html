@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -391,7 +391,7 @@
                 <i class="fas fa-pen-alt"></i>
                 Оставить отзыв
             </div>
-            <form id="reviewForm">
+            <form id="reviewForm" th:action="@{/leaveComment}" th:method="post">
                 <div class="form-group">
                     <label><i class="fas fa-user"></i> Ваше имя</label>
                     <input type="text" id="userName" placeholder="Например: Анна П." required>
