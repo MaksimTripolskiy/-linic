@@ -1,3 +1,4 @@
+
 package com.geoclinic.controller;
 
 import com.geoclinic.model.Comment;
@@ -22,7 +23,7 @@ public class CommentController {
     public String createPendingComment(@ModelAttribute Comment comment, Model model) {
         try {
             // Сохранить клинику
-            comment.setStatus(CommentStatus.PENDING);
+            comment.setStatus(CommentStatus.PENDING);  //   fixme
             commentService.addComment(comment);
             model.addAttribute("message", "Comment created successfully!");
         } catch (Exception e) {

@@ -12,6 +12,6 @@ import java.util.List;
 public interface CommentDAO extends JpaRepository<Comment, Long> {
 
 
-    @Query("SELECT c FROM Comment c WHERE c.status = 'PENDING' ORDER BY c.createdAt ASC")
-    List<Comment> findAllPendingComments();
+//    @Query("SELECT c FROM Comment c WHERE c.status = 'PENDING' ORDER BY c.createdAt ASC")
+//    List<Comment> findAllPendingComments();
 }

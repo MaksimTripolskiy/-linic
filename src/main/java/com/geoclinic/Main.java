@@ -1,7 +1,9 @@
 package com.geoclinic;
 
 import com.geoclinic.dto.RegistrationRequest;
+import com.geoclinic.model.Comment;
 import com.geoclinic.model.User;
+import com.geoclinic.service.CommentService;
 import com.geoclinic.service.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,5 +27,16 @@ public class Main {
 
 
         service.registerNewUser(req);
+
+
+
+        //---------
+
+        CommentService commentService = context.getBean(CommentService.class);
+
+        Comment comment = new Comment();
+        comment.setText("this is a comment");
+
+        commentService.addComment(comment);
     }
 }

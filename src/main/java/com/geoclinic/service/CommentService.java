@@ -12,10 +12,12 @@ public class CommentService {
     private CommentDAO commentDAO;
 
     public List<Comment> getPendingComments() {
-        return commentDAO.findAllPendingComments();
+        return null;    // todo
+//        return commentDAO.findAllPendingComments();
     }
 
     public void addComment(Comment comment) {       // todo status set where?
         commentDAO.save(comment);
     }
 }
+

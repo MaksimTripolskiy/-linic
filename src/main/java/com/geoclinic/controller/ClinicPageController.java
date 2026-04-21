@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
@@ -45,6 +46,12 @@ public class ClinicPageController {
         }
         return "create-clinic-map"; // вернуть ту же страницу с сообщением
     }
+
+    @GetMapping(value = "/getClinic")           // fixme
+    public String getClinic(@RequestParam(value = "id") Long id) {
+        return "clinic-page";
+    }
+
 
     @GetMapping(value = "/page/getAllClinics")
     public String getAllClinics(Model model) {

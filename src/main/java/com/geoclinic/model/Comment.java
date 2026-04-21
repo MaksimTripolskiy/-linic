@@ -1,10 +1,8 @@
 package com.geoclinic.model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -13,11 +11,21 @@ import java.time.LocalDateTime;
 @Entity
 public class Comment {
 
-    private String user;
-    private String comment;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
+    private Long id;
+    @Column(name="commenter")
+    private String commenter;
+    @Column(name="text")
+    private String text;
+    @Column(name="datetime")
     private LocalDateTime dateTime;
+    @Column(name="clinic_id")
     private int clinicId;
+    @Column(name="status")
     private CommentStatus status;
+    @Column(name="rating")
     private int rating;
 
     public Comment() {}
