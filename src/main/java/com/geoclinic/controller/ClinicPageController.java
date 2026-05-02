@@ -1,7 +1,9 @@
 package com.geoclinic.controller;
 
 import com.geoclinic.model.Clinic;
+import com.geoclinic.model.Comment;
 import com.geoclinic.service.ClinicService;
+import com.geoclinic.service.CommentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,9 +20,11 @@ import java.util.List;
 public class ClinicPageController {
 
     private ClinicService clinicService;
+    private CommentService commentService;
 
-    public ClinicPageController(ClinicService clinicService) {
+    public ClinicPageController(ClinicService clinicService, CommentService commentService) {
         this.clinicService = clinicService;
+        this.commentService = commentService;
     }
 
     @GetMapping("/registerUser2")
@@ -48,7 +52,14 @@ public class ClinicPageController {
     }
 
     @GetMapping(value = "/getClinic")           // fixme
-    public String getClinic(@RequestParam(value = "id") Long id) {
+    public String getClinic(@RequestParam(value = "id") Long id, Model model) {
+
+        Clinic clinic = clinicService.getClinicById(id);
+        List<Comment> comments = commentService.getCommentsByClinicId(id);
+
+        model.addAttribute("clinic", clinic);
+        model.addAttribute("reviews", comments);
+
         return "clinic-page";
     }
 

@@ -21,12 +21,16 @@ public class Comment {
     private String text;
     @Column(name="datetime")
     private LocalDateTime dateTime;
-    @Column(name="clinic_id")
-    private int clinicId;
+//    @Column(name="clinic_id")
+//    private int clinicId;
     @Column(name="status")
     private CommentStatus status;
     @Column(name="rating")
     private int rating;
+
+    @ManyToOne
+    @JoinColumn(name = "clinic_id")         // todo ap 5/10 cascade
+    private Clinic clinic;
 
     public Comment() {}
 

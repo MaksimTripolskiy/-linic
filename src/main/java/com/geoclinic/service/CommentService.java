@@ -11,6 +11,14 @@ public class CommentService {
 
     private CommentDAO commentDAO;
 
+    public CommentService(CommentDAO commentDAO) {
+        this.commentDAO = commentDAO;
+    }
+
+    public List<Comment> getCommentsByClinicId(long id) {
+        return commentDAO.findCommentsByClinicId(id);
+    }
+
     public List<Comment> getPendingComments() {
         return null;    // todo
 //        return commentDAO.findAllPendingComments();

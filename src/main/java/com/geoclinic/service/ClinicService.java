@@ -15,6 +15,11 @@ public class ClinicService {
         this.clinicDAO = clinicDAO;
     }
 
+    public Clinic getClinicById(long id) {
+        return clinicDAO.findById(id)
+                .orElse(new Clinic());          // todo ap 5/10 handle optional
+    }
+
     public List<Clinic> getAllClinics() {
         return clinicDAO.findAll();
     }

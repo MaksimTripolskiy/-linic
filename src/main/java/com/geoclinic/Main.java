@@ -15,38 +15,40 @@ public class Main {
 
 
     public static void main(String[] args) {
-//        ApplicationContext context = SpringApplication.run(Main.class);
-//
-//
-////        User user = new User("user2","pass2","ROLE_USER");
-//
-//        RegistrationRequest req = new RegistrationRequest();
-//        req.setUsername("user2");
-//        req.setPassword("pass2");
-//
-//        UserService service = context.getBean(UserService.class);
-//
-//
-//        service.registerNewUser(req);
-//
-//
-//
-//        //---------
-//
-//        CommentService commentService = context.getBean(CommentService.class);
-//
-//        Comment comment = new Comment();
-//        comment.setText("this is a comment");
-//
-//        commentService.addComment(comment);
+        ApplicationContext context = SpringApplication.run(Main.class);
 
-        RouteService routeService = new RouteService();
 
-        try {
-            System.out.println(routeService.getRoute(55.740919, 37.613239, 55.755991,37.654781));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+//        User user = new User("user2","pass2","ROLE_USER");
+
+        RegistrationRequest req = new RegistrationRequest();
+        req.setUsername("user2");
+        req.setPassword("pass2");
+
+        UserService service = context.getBean(UserService.class);
+
+
+        service.registerNewUser(req);
+
+
+
+        //---------
+
+        CommentService commentService = context.getBean(CommentService.class);
+
+        Comment comment = new Comment();
+        comment.setText("this is a comment");
+
+        commentService.addComment(comment);
+
+//        String apiKey = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijk5YWQ0OWNhNDc1NTRkOThiZDIxZGY5NjU0M2YzZGEyIiwiaCI6Im11cm11cjY0In0=";
+//
+//        RouteService routeService = new RouteService(apiKey);
+//
+//        try {
+//            System.out.println(routeService.getRoute(55.751849391735284, 37.60594367980958, 55.76189525593947, 37.61817455291749));
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
 
     }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Медицинский центр «Здоровье+» | Отзывы пациентов</title>
+    <title th:text="${clinic.name} + ' | Отзывы пациентов'">Медицинский центр «Здоровье+» | Отзывы пациентов</title>
     <!-- Google Fonts и Font Awesome для иконок -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -330,58 +330,79 @@
 </head>
 <body>
 <div class="container">
-    <!-- Блок информации о клинике -->
+    <!-- Блок информации о клинике (данные из модели) -->
     <div class="hero">
         <h1>
             <i class="fas fa-hospital-user"></i>
-            Медицинский центр «Здоровье+»
+            <span th:text="${clinic.name}">Медицинский центр «Здоровье+»</span>
         </h1>
         <div class="rating-badge">
             <i class="fas fa-star"></i>
-            <span id="avgRatingDisplay">4.8</span> ★
-            <span id="reviewsCountDisplay">(12 отзывов)</span>
+            <span th:text="${#numbers.formatDecimal(avgRating, 1, 1)}">4.8</span> ★
+            <span th:text="'(' + ${reviews.size()} + ' ' + ${reviewCountText} + ')'">(12 отзывов)</span>
         </div>
         <div class="info-grid">
             <div class="info-card">
                 <i class="fas fa-map-marker-alt"></i>
                 <div>
                     <p>Адрес</p>
-                    <p>г. Москва, ул. Медиков, 12</p>
+                    <p th:text="${clinic.address}">г. Москва, ул. Медиков, 12</p>
                 </div>
             </div>
             <div class="info-card">
                 <i class="fas fa-clock"></i>
                 <div>
                     <p>Режим работы</p>
-                    <p>Пн-Вс: 08:00 – 21:00</p>
+                    <p th:text="${clinic.workHours}">Пн-Вс: 08:00 – 21:00</p>
                 </div>
             </div>
             <div class="info-card">
                 <i class="fas fa-stethoscope"></i>
                 <div>
                     <p>Направления</p>
-                    <p>Терапия, Кардиология, Неврология</p>
+                    <p th:text="${clinic.specializations}">Терапия, Кардиология, Неврология</p>
                 </div>
             </div>
             <div class="info-card">
                 <i class="fas fa-phone-alt"></i>
                 <div>
                     <p>Телефон</p>
-                    <p>+7 (495) 123-45-67</p>
+                    <p th:text="${clinic.phone}">+7 (495) 123-45-67</p>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="main-layout">
-        <!-- Список отзывов -->
+        <!-- Список отзывов (из модели) -->
         <div class="reviews-section">
             <div class="section-title">
                 <i class="fas fa-comments"></i>
                 Отзывы пациентов
             </div>
             <div id="reviewsListContainer" class="reviews-list">
-                <!-- динамические отзывы будут вставлены сюда через JS -->
+                <div th:if="${reviews.isEmpty()}" class="empty-message">
+                    <i class="far fa-frown"></i> Пока нет отзывов. Будьте первым, кто оставит отзыв!
+                </div>
+                <div th:each="review : ${reviews}" class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-name">
+                            <i class="fas fa-user-circle"></i>
+                            <span th:text="${review.commenter}">Анна П.</span>
+                        </div>
+                        <div class="review-stars" th:with="rating=${review.rating}">
+                            <th:block th:each="i, iterStat : ${#numbers.sequence(1, 5)}">
+                                <i th:if="${iterStat.index < rating}" class="fas fa-star"></i>
+                                <i th:unless="${iterStat.index < rating}" class="far fa-star"></i>
+                            </th:block>
+                        </div>
+                    </div>
+                    <div class="review-date">
+                        <i class="far fa-calendar-alt"></i>
+                        <span th:text="${#temporals.format(review.createdDate, 'dd.MM.yyyy')}">18.02.2025</span>
+                    </div>
+                    <div class="review-text" th:text="${review.text}">Текст отзыва</div>
+                </div>
             </div>
         </div>
 
@@ -391,18 +412,16 @@
                 <i class="fas fa-pen-alt"></i>
                 Оставить отзыв
             </div>
-<!--            <form id="reviewForm" th:action="@{/leaveComment}" th:method="post">-->
-            <form id="reviewForm" onsubmit="/leaveComment">
-
-            <div class="form-group">
+            <form id="reviewForm" th:action="@{/leaveComment/{id}(id=${clinic.id})}" method="post">
+                <div class="form-group">
                     <label><i class="fas fa-user"></i> Ваше имя</label>
-                    <input type="text" id="userName" placeholder="Например: Анна П." required>
+                    <input type="text" name="commenter" placeholder="Например: Анна П." required>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-star"></i> Оценка</label>
                     <div class="star-rating-wrapper">
-                        <div class="star-rating" id="starRatingWidget">
-                            <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="Отлично">★</label>
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" required><label for="star5" title="Отлично">★</label>
                             <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="Хорошо">★</label>
                             <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="Удовлетворительно">★</label>
                             <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="Плохо">★</label>
@@ -412,201 +431,30 @@
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-comment-dots"></i> Текст отзыва</label>
-                    <textarea id="reviewText" rows="4" placeholder="Поделитесь впечатлением о клинике..." required></textarea>
+                    <textarea name="text" rows="4" placeholder="Поделитесь впечатлением о клинике..." required></textarea>
                 </div>
                 <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> Отправить отзыв</button>
-                <div id="formFeedback" class="toast-msg"></div>
+                <div id="formFeedback" class="toast-msg" th:if="${message}" th:text="${message}" style="opacity: 1;"></div>
             </form>
             <hr>
             <div style="font-size: 0.75rem; color: #5a6e7c; text-align: center;">
-                <i class="fas fa-shield-alt"></i> Все отзывы проходят модерацию (демо-режим)
+                <i class="fas fa-shield-alt"></i> Все отзывы проходят модерацию
             </div>
         </div>
     </div>
     <footer>
-        <i class="fas fa-heartbeat"></i> Лицензия ЛО-77-01-123456 | Современные технологии заботы о вашем здоровье
+        <i class="fas fa-heartbeat"></i> <span th:text="${clinic.license}">Лицензия ЛО-77-01-123456</span> | Современные технологии заботы о вашем здоровье
     </footer>
 </div>
 
 <script>
-    // ---------- Начальные данные (примеры отзывов) ----------
-    let reviews = [
-        {
-            id: "rev1",
-            name: "Екатерина Смирнова",
-            rating: 5,
-            text: "Очень внимательные врачи! Прошла полное обследование, всё четко и комфортно. Клиника светлая, современное оборудование. Рекомендую!",
-            date: "2025-02-18T10:30:00"
-        },
-        {
-            id: "rev2",
-            name: "Алексей Королёв",
-            rating: 4,
-            text: "Хороший центр, запись по записи, очередей нет. Кардиолог очень грамотный. Минус один — цены чуть выше среднего, но качество того стоит.",
-            date: "2025-02-10T14:20:00"
-        },
-        {
-            id: "rev3",
-            name: "Мария Тихонова",
-            rating: 5,
-            text: "Лучшая клиника в районе! Дочку привела на прививку — всё аккуратно, без стресса. Персонал вежливый, спасибо большое!",
-            date: "2025-02-05T09:15:00"
-        },
-        {
-            id: "rev4",
-            name: "Игорь Петров",
-            rating: 3,
-            text: "Нормальная клиника, но на ресепшене иногда долго оформляют. Врач толковый, лечение помогло. Надеюсь, улучшат сервис.",
-            date: "2025-01-28T16:45:00"
-        }
-    ];
-
-    // Вспомогательные функции
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        const day = date.getDate().toString().padStart(2,'0');
-        const month = (date.getMonth()+1).toString().padStart(2,'0');
-        const year = date.getFullYear();
-        return `${day}.${month}.${year}`;
-    }
-
-    // Рендер отзывов
-    function renderReviews() {
-        const container = document.getElementById('reviewsListContainer');
-        if (!container) return;
-
-        if (reviews.length === 0) {
-            container.innerHTML = `<div class="empty-message"><i class="far fa-frown"></i> Пока нет отзывов. Будьте первым, кто оставит отзыв!</div>`;
-            updateStats();
-            return;
-        }
-
-        // Сортируем по дате (новые сверху)
-        const sorted = [...reviews].sort((a,b) => new Date(b.date) - new Date(a.date));
-
-        let html = '';
-        sorted.forEach(rev => {
-            // звезды
-            let starsHtml = '';
-            for (let i=1; i<=5; i++) {
-                starsHtml += i <= rev.rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
-            }
-            html += `
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="reviewer-name"><i class="fas fa-user-circle"></i> ${escapeHtml(rev.name)}</div>
-                        <div class="review-stars">${starsHtml}</div>
-                    </div>
-                    <div class="review-date"><i class="far fa-calendar-alt"></i> ${formatDate(rev.date)}</div>
-                    <div class="review-text">${escapeHtml(rev.text)}</div>
-                </div>
-            `;
-        });
-        container.innerHTML = html;
-        updateStats();
-    }
-
-    // обновление средней оценки и количества отзывов в шапке
-    function updateStats() {
-        const count = reviews.length;
-        if (count === 0) {
-            document.getElementById('avgRatingDisplay').innerText = '0.0';
-            document.getElementById('reviewsCountDisplay').innerText = '(0 отзывов)';
-            return;
-        }
-        let sum = 0;
-        reviews.forEach(r => sum += r.rating);
-        const avg = (sum / count).toFixed(1);
-        document.getElementById('avgRatingDisplay').innerText = avg;
-        document.getElementById('reviewsCountDisplay').innerText = `(${count} ${getDeclension(count, 'отзыв', 'отзыва', 'отзывов')})`;
-    }
-
-    function getDeclension(n, one, two, five) {
-        n = Math.abs(n) % 100;
-        if (n >= 5 && n <= 20) return five;
-        n %= 10;
-        if (n === 1) return one;
-        if (n >= 2 && n <= 4) return two;
-        return five;
-    }
-
-    // простой escape для защиты от XSS
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c;
-        });
-    }
-
-    // Добавление нового отзыва
-    function addReview(name, rating, text) {
-        if (!name.trim() || !text.trim()) {
-            showFormFeedback('Пожалуйста, заполните имя и текст отзыва.', 'error');
-            return false;
-        }
-        if (!rating || rating < 1 || rating > 5) {
-            showFormFeedback('Пожалуйста, выберите оценку (от 1 до 5 звезд).', 'error');
-            return false;
-        }
-
-        const newReview = {
-            id: Date.now().toString(),
-            name: name.trim(),
-            rating: parseInt(rating),
-            text: text.trim(),
-            date: new Date().toISOString()
-        };
-        reviews.unshift(newReview); // добавляем в начало (новый сверху)
-        renderReviews();  // перерисовываем список
-
-        // очистка формы
-        document.getElementById('userName').value = '';
-        document.getElementById('reviewText').value = '';
-        // сброс звёзд radio
-        const radioButtons = document.querySelectorAll('input[name="rating"]');
-        radioButtons.forEach(rb => rb.checked = false);
-
-        showFormFeedback('Спасибо! Ваш отзыв добавлен.', 'success');
-        // плавный скролл к началу списка отзывов
-        const reviewsContainer = document.querySelector('.reviews-section');
-        if (reviewsContainer) reviewsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        return true;
-    }
-
-    function showFormFeedback(msg, type) {
-        const feedbackDiv = document.getElementById('formFeedback');
-        if (!feedbackDiv) return;
-        feedbackDiv.style.opacity = '1';
-        feedbackDiv.style.backgroundColor = type === 'success' ? '#2e7d64' : '#b33b2c';
-        feedbackDiv.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+    // Автоматическое скрытие сообщения через 3.5 секунды
+    const feedbackDiv = document.getElementById('formFeedback');
+    if (feedbackDiv && feedbackDiv.innerText.trim() !== '') {
         setTimeout(() => {
             feedbackDiv.style.opacity = '0';
         }, 3500);
     }
-
-    // обработка отправки формы
-    document.getElementById('reviewForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = document.getElementById('userName').value;
-        const text = document.getElementById('reviewText').value;
-        let rating = null;
-        const selectedRating = document.querySelector('input[name="rating"]:checked');
-        if (selectedRating) rating = selectedRating.value;
-        addReview(name, rating, text);
-    });
-
-    // инициализация страницы: рендер отзывов
-    renderReviews();
-
-    // дополнительно: добавим поддержку клика по звёздам для удобства
-    // уже работает через label, но создадим также hover-эффект через CSS (уже есть)
-    // небольшой фикс: для корректного отображения рейтинга в форме (пусть показывается значение)
-    // также можно сделать предустановленный пример
 </script>
 </body>
 </html>

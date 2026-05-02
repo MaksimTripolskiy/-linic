@@ -27,6 +27,9 @@ public class Clinic {
     @Column(name="longitude")
     private double longitude;
 
+    @OneToMany(mappedBy = "clinic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Comment> reviews;
+
 
 //    @OneToOne
 //    private Coordinates coordinates;

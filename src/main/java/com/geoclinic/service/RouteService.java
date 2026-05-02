@@ -25,7 +25,7 @@ public class RouteService {
      * @return RouteResponse with distance and duration
      */
 
-    private static final String BASE_URL = "https://api.openrouteservice.org/v2/directions/driving-car";            /// todo car or person?
+    private static final String BASE_URL = "https://api.openrouteservice.org/v2/directions/foot-walking";            /// todo car or person?
     private final String apiKey;
     private final HttpClient httpClient;
     private final Gson gson;
@@ -44,9 +44,11 @@ public class RouteService {
         String url = BASE_URL + "?start=" + startLon + "," + startLat +
                 "&end=" + endLon + "," + endLat + "&api_key=" + apiKey;
 
+        System.out.println(url);
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .header("Accept", "application/json")
+//                .header("Accept", "application/json")
                 .GET()
                 .build();
 

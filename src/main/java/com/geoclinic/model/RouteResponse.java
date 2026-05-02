@@ -39,7 +39,10 @@ public class RouteResponse {
 
     @Override
     public String toString() {
-        return String.format("Distance: %s, Duration: %s",
-                getFormattedDistance(), getFormattedDuration());
+        return String.format("""
+                        Distance: %s, Duration: %s,
+                        Raw response: %s
+                        """,
+                getFormattedDistance(), getFormattedDuration(), rawResponse);
     }
 }
