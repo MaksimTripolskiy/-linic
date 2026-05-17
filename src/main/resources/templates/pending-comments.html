@@ -363,7 +363,7 @@
   // Функция загрузки начальных данных (как будто из БД)
   function loadInitialData() {
       // Попытка загрузить из localStorage, если нет — создаем демо-данные
-      const stored = localStorage.getItem('moderation_comments_db');
+      const stored = localStorage.getItem('comments');
       if (stored) {
           commentsDB = JSON.parse(stored);
       } else {

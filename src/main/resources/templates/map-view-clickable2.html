@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Карта клиник - Geoclinic с маршрутами</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f5f5;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+    }
+
+    .main-container {
+        display: flex;
+        padding: 20px;
+        gap: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .sidebar {
+        width: 320px;
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        height: fit-content;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .sidebar h3 {
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .search-box {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .clinic-list {
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 15px;
+    }
+
+    .clinic-item {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .clinic-item:hover {
+        background: #f0f0f0;
+    }
+
+    .clinic-item h4 {
+        margin: 0 0 5px;
+        color: #667eea;
+    }
+
+    .clinic-item p {
+        margin: 0;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .map-container {
+        flex: 1;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    #map {
+        height: 600px;
+        width: 100%;
+    }
+
+    .specialty-filter {
+        margin: 15px 0;
+    }
+
+    .specialty-filter select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    button:hover {
+        background: #5a67d8;
+    }
+
+    button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+
+    .route-info {
+        margin-top: 15px;
+        padding: 10px;
+        background: #f9f9f9;
+        border-radius: 5px;
+        font-size: 12px;
+        display: none;
+    }
+
+    .route-info.show {
+        display: block;
+    }
+
+    .route-stats {
+        background: #e8f5e9;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+    }
+
+    .user-marker {
+        font-size: 30px;
+        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+        animation: bounce 0.5s ease;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @media (max-width: 768px) {
+        .main-container {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            max-height: 400px;
+        }
+    }
+  </style>
+</head>
+<body>
+<div class="header">
+  <h1>🏥 Geoclinic - Карта медицинских центров</h1>
+  <p>Найдите ближайшие клиники и постройте маршрут</p>
+</div>
+
+<div class="main-container">
+  <!-- Боковая панель -->
+  <div class="sidebar">
+    <h3>🔍 Поиск клиник</h3>
+
+    <input type="text" id="searchInput" class="search-box" placeholder="Поиск по названию...">
+
+    <div class="specialty-filter">
+      <select id="specialtyFilter">
+        <option value="all">Все специальности</option>
+        <option value="dental">Стоматология</option>
+        <option value="cardiology">Кардиология</option>
+        <option value="pediatrics">Педиатрия</option>
+        <option value="ophthalmology">Офтальмология</option>
+      </select>
+    </div>
+
+    <button id="nearbyBtn">📍 Показать ближайшие (GPS)</button>
+    <button id="selectOnMapBtn">🗺️ Указать на карте</button>
+    <button id="clearLocationBtn" style="background: #999;">❌ Очистить маркер</button>
+    <button id="resetViewBtn">🗺️ Сбросить вид</button>
+
+    <div id="locationStatus" style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 5px; font-size: 12px; display: none;">
+      📍 Ваша позиция: <span id="coordsDisplay"></span>
+    </div>
+
+    <div id="routeInfo" class="route-info">
+      <h4>🗺️ Информация о маршруте</h4>
+      <div id="routeDetails"></div>
+      <button id="clearRouteBtn" style="background: #dc3545; margin-top: 10px;">❌ Очистить маршрут</button>
+    </div>
+
+    <h3>📋 Список клиник</h3>
+    <div id="clinicList" class="clinic-list">
+      <!-- Список будет заполнен JavaScript -->
+    </div>
+  </div>
+
+  <!-- Карта -->
+  <div class="map-container">
+    <div id="map"></div>
+  </div>
+</div>
+
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script th:inline="javascript">
+  // Данные клиник из Spring Model
+  const clinicsData = JSON.parse(/*[[${clinicsJson}]]*/ '[]');
+
+  // Инициализация карты
+  const map = L.map('map').setView([55.751244, 37.618423], 12);
+
+  // Добавляем слой карты
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // Переменные
+  let currentMarkerLayer = null;
+  let userMarker = null;
+  let userLocation = null;
+  let currentRoute = null;
+
+  // Кастомная иконка для клиник
+  const clinicIcon = L.divIcon({
+      html: '🏥',
+      iconSize: [30, 30],
+      className: 'clinic-marker',
+      popupAnchor: [0, -15]
+  });
+
+  // Функция для отображения клиник на карте
+  function displayClinics(clinics) {
+      if (currentMarkerLayer) {
+          map.removeLayer(currentMarkerLayer);
+      }
+
+      currentMarkerLayer = L.layerGroup().addTo(map);
+
+      clinics.forEach(clinic => {
+          if (clinic.latitude && clinic.longitude) {
+              const marker = L.marker([clinic.latitude, clinic.longitude], {
+                  icon: clinicIcon
+              }).addTo(currentMarkerLayer);
+
+              marker.options.clinicId = clinic.id;
+              marker.options.clinic = clinic;
+
+              // Содержимое всплывающего окна с кнопкой построения маршрута
+              const popupContent = `
+                  <div style="min-width: 250px;">
+                      <h4 style="margin: 0 0 5px; color: #667eea;">${clinic.name}</h4>
+                      <p style="margin: 5px 0;"><strong>📍 Адрес:</strong> ${clinic.address || 'Не указан'}</p>
+                      <p style="margin: 5px 0;"><strong>📞 Телефон:</strong> ${clinic.phone || 'Не указан'}</p>
+                      <p style="margin: 5px 0;"><strong>🏥 Специализация:</strong> ${clinic.type || 'Общая'}</p>
+                      <hr style="margin: 10px 0;">
+                      <button onclick="buildRouteToClinic(${clinic.latitude}, ${clinic.longitude}, '${clinic.name.replace(/'/g, "\\'")}')"
+                              style="background: #28a745; padding: 5px 10px; font-size: 12px;">
+                          🚗 Построить маршрут
+                      </button>
+                      <a href="/clinic-page.html" style="color: #667eea; margin-left: 10px;">Подробнее →</a>
+                  </div>
+              `;
+
+              marker.bindPopup(popupContent);
+
+              marker.on('click', () => {
+                  highlightClinicInList(clinic.id);
+              });
+          }
+      });
+
+      displayClinicList(clinics);
+  }
+
+  // Функция для отображения списка клиник с кнопкой маршрута
+  function displayClinicList(clinics) {
+      const clinicListDiv = document.getElementById('clinicList');
+      clinicListDiv.innerHTML = '';
+
+      if (clinics.length === 0) {
+          clinicListDiv.innerHTML = '<div style="padding: 20px; text-align: center;">Клиники не найдены</div>';
+          return;
+      }
+
+      clinics.forEach(clinic => {
+          const clinicDiv = document.createElement('div');
+          clinicDiv.className = 'clinic-item';
+          clinicDiv.setAttribute('data-id', clinic.id);
+
+          clinicDiv.innerHTML = `
+              <h4>${clinic.name}</h4>
+              <p>📍 ${clinic.address || 'Адрес не указан'}</p>
+              <p>🏥 ${clinic.specialty || 'Общая'}</p>
+              <button onclick="buildRouteToClinic(${clinic.latitude}, ${clinic.longitude}, '${clinic.name.replace(/'/g, "\\'")}')"
+                      style="background: #28a745; padding: 5px; margin-top: 5px; font-size: 11px;">
+                  🚗 Построить маршрут
+              </button>
+          `;
+
+          clinicDiv.querySelector('h4').onclick = () => {
+              if (clinic.latitude && clinic.longitude) {
+                  map.setView([clinic.latitude, clinic.longitude], 16);
+                  const marker = findMarkerById(clinic.id);
+                  if (marker) {
+                      marker.openPopup();
+                  }
+              }
+          };
+
+          clinicListDiv.appendChild(clinicDiv);
+      });
+  }
+
+  // Построение маршрута через бэкэнд
+  window.buildRouteToClinic = async function(destLat, destLng, clinicName) {
+      if (!userLocation) {
+          alert('Пожалуйста, сначала укажите ваше местоположение (через GPS или кликом на карте)');
+          return;
+      }
+
+      // Очищаем предыдущий маршрут
+      clearRoute();
+
+      // Показываем индикатор загрузки
+      const routeInfo = document.getElementById('routeInfo');
+      const routeDetails = document.getElementById('routeDetails');
+      routeDetails.innerHTML = '<div style="text-align: center;">⏳ Загрузка маршрута...</div>';
+      routeInfo.classList.add('show');
+
+      try {
+          // Отправляем координаты на бэкэнд
+          const requestBody = {
+              startLat: userLocation.lat,
+              startLng: userLocation.lng,
+              endLat: destLat,
+              endLng: destLng
+          };
+
+          console.log('Отправка запроса на бэкэнд:', requestBody);
+
+          const response = await fetch('/api/route', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(requestBody)
+          });
+
+          if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const routeData = await response.json();
+          console.log('Получены данные маршрута:', routeData);
+
+          // Отрисовываем маршрут на карте
+          if (routeData.geometry) {
+              // Если бэкэнд возвращает GeoJSON geometry
+              const routeLayer = L.geoJSON(routeData.geometry, {
+                  style: {
+                      color: '#2563eb',
+                      weight: 5,
+                      opacity: 0.8
+                  }
+              }).addTo(map);
+
+              currentRoute = routeLayer;
+
+              // Добавляем маркеры начала и конца пути
+              const startIcon = L.divIcon({
+                  html: '🚩',
+                  iconSize: [25, 25],
+                  className: 'route-marker'
+              });
+
+              const endIcon = L.divIcon({
+                  html: '🏁',
+                  iconSize: [25, 25],
+                  className: 'route-marker'
+              });
+
+              L.marker([userLocation.lat, userLocation.lng], {icon: startIcon})
+                  .bindPopup('Ваше местоположение')
+                  .addTo(map);
+
+              L.marker([destLat, destLng], {icon: endIcon})
+                  .bindPopup(clinicName)
+                  .addTo(map);
+
+              // Отображаем информацию о маршруте
+              const distance = routeData.distance ? (routeData.distance / 1000).toFixed(1) : 'N/A';
+              const duration = routeData.duration ? Math.round(routeData.duration / 60) : 'N/A';
+
+              routeDetails.innerHTML = `
+                  <div class="route-stats">
+                      <strong>🚗 Маршрут до: ${clinicName}</strong><br>
+                      📍 Расстояние: ${distance} км<br>
+                      ⏱️ Время в пути: ${duration} мин<br>
+                      ${routeData.summary ? `<small>${routeData.summary}</small>` : ''}
+                  </div>
+              `;
+
+              // Приближаем карту к маршруту
+              const bounds = routeLayer.getBounds();
+              map.fitBounds(bounds, {padding: [50, 50]});
+
+          } else if (routeData.features && routeData.features.length > 0) {
+              // Если бэкэнд возвращает полный GeoJSON с features
+              const routeLayer = L.geoJSON(routeData, {
+                  style: {
+                      color: '#2563eb',
+                      weight: 5,
+                      opacity: 0.8
+                  }
+              }).addTo(map);
+
+              currentRoute = routeLayer;
+
+              const properties = routeData.features[0].properties;
+              const distance = properties.summary?.distance ? (properties.summary.distance / 1000).toFixed(1) : 'N/A';
+              const duration = properties.summary?.duration ? Math.round(properties.summary.duration / 60) : 'N/A';
+
+              routeDetails.innerHTML = `
+                  <div class="route-stats">
+                      <strong>🚗 Маршрут до: ${clinicName}</strong><br>
+                      📍 Расстояние: ${distance} км<br>
+                      ⏱️ Время в пути: ${duration} мин
+                  </div>
+              `;
+
+              const bounds = routeLayer.getBounds();
+              map.fitBounds(bounds, {padding: [50, 50]});
+          } else {
+              throw new Error('Неверный формат данных маршрута');
+          }
+
+      } catch (error) {
+          console.error('Ошибка при построении маршрута:', error);
+          routeDetails.innerHTML = `<div style="color: red;">Ошибка: ${error.message}<br>Проверьте соединение с бэкэндом</div>`;
+      }
+  };
+
+  // Очистка маршрута
+  function clearRoute() {
+      if (currentRoute) {
+          map.removeLayer(currentRoute);
+          currentRoute = null;
+      }
+
+      // Очищаем временные маркеры
+      map.eachLayer(layer => {
+          if (layer instanceof L.Marker &&
+              layer.options.icon &&
+              (layer.options.icon.options.html === '🚩' ||
+               layer.options.icon.options.html === '🏁')) {
+              map.removeLayer(layer);
+          }
+      });
+
+      const routeInfo = document.getElementById('routeInfo');
+      routeInfo.classList.remove('show');
+  }
+
+  // Поиск маркера по ID
+  function findMarkerById(clinicId) {
+      let foundMarker = null;
+      if (currentMarkerLayer) {
+          currentMarkerLayer.eachLayer(layer => {
+              if (layer.options && layer.options.clinicId === clinicId) {
+                  foundMarker = layer;
+              }
+          });
+      }
+      return foundMarker;
+  }
+
+  // Подсветка клиники в списке
+  function highlightClinicInList(clinicId) {
+      const items = document.querySelectorAll('.clinic-item');
+      items.forEach(item => {
+          if (item.getAttribute('data-id') == clinicId) {
+              item.style.background = '#e0e7ff';
+              setTimeout(() => {
+                  item.style.background = '';
+              }, 2000);
+          }
+      });
+  }
+
+  // Фильтрация клиник
+  function filterClinics() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const specialty = document.getElementById('specialtyFilter').value;
+
+      let filtered = clinicsData;
+
+      if (searchTerm) {
+          filtered = filtered.filter(clinic =>
+              clinic.name.toLowerCase().includes(searchTerm) ||
+              (clinic.address && clinic.address.toLowerCase().includes(searchTerm))
+          );
+      }
+
+      if (specialty !== 'all') {
+          filtered = filtered.filter(clinic =>
+              clinic.specialty && clinic.specialty.toLowerCase() === specialty
+          );
+      }
+
+      displayClinics(filtered);
+  }
+
+  // Поиск ближайших клиник через GPS
+  function findNearbyClinics() {
+      if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(async function(position) {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+
+              userLocation = { lat: lat, lng: lng };
+              map.setView([lat, lng], 13);
+
+              if (userMarker) {
+                  map.removeLayer(userMarker);
+              }
+
+              userMarker = L.marker([lat, lng], {
+                  icon: L.divIcon({
+                      html: '📍',
+                      iconSize: [30, 30],
+                      className: 'user-marker'
+                  }),
+                  zIndexOffset: 1000
+              }).addTo(map);
+              userMarker.bindPopup('Вы здесь').openPopup();
+
+              const locationStatus = document.getElementById('locationStatus');
+              const coordsDisplay = document.getElementById('coordsDisplay');
+              coordsDisplay.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+              locationStatus.style.display = 'block';
+              locationStatus.style.background = '#d4edda';
+              locationStatus.style.border = '1px solid #c3e6cb';
+
+              try {
+                  const response = await fetch(`/api/clinics/nearby?lat=${lat}&lng=${lng}&radius=5`);
+                  const nearbyClinics = await response.json();
+                  displayClinics(nearbyClinics);
+              } catch (error) {
+                  console.error('Ошибка:', error);
+                  alert('Не удалось найти клиники рядом с вами');
+              }
+
+              setTimeout(() => {
+                  locationStatus.style.background = '#f0f0f0';
+                  locationStatus.style.border = 'none';
+              }, 2000);
+
+          }, function(error) {
+              alert('Не удалось определить местоположение. Укажите его на карте вручную.');
+          });
+      } else {
+          alert('Геолокация не поддерживается');
+      }
+  }
+
+  // Обработка клика по карте
+  function handleMapClick(e) {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
+
+      userLocation = { lat: lat, lng: lng };
+
+      if (userMarker) {
+          map.removeLayer(userMarker);
+      }
+
+      userMarker = L.marker([lat, lng], {
+          icon: L.divIcon({
+              html: '📍',
+              iconSize: [30, 30],
+              className: 'user-marker'
+          }),
+          zIndexOffset: 1000
+      }).addTo(map);
+
+      userMarker.bindPopup('Вы выбрали это место').openPopup();
+
+      const locationStatus = document.getElementById('locationStatus');
+      const coordsDisplay = document.getElementById('coordsDisplay');
+      coordsDisplay.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      locationStatus.style.display = 'block';
+      locationStatus.style.background = '#d4edda';
+      locationStatus.style.border = '1px solid #c3e6cb';
+
+      findNearbyClinicsByCoords(lat, lng);
+  }
+
+  // Поиск клиник по координатам
+  async function findNearbyClinicsByCoords(lat, lng) {
+      map.setView([lat, lng], 13);
+
+      try {
+          const response = await fetch(`/api/clinics/nearby?lat=${lat}&lng=${lng}&radius=5`);
+          const nearbyClinics = await response.json();
+          displayClinics(nearbyClinics);
+      } catch (error) {
+          console.error('Ошибка:', error);
+          alert('Не удалось найти клиники рядом с выбранной позицией');
+      }
+  }
+
+  // Очистка маркера пользователя
+  function clearUserLocation() {
+      if (userMarker) {
+          map.removeLayer(userMarker);
+          userMarker = null;
+      }
+      userLocation = null;
+      clearRoute();
+
+      const locationStatus = document.getElementById('locationStatus');
+      locationStatus.style.display = 'none';
+
+      displayClinics(clinicsData);
+      resetView();
+  }
+
+  // Сброс вида
+  function resetView() {
+      map.setView([55.751244, 37.618423], 12);
+      if (!userMarker) {
+          displayClinics(clinicsData);
+      }
+  }
+
+  // Добавляем обработчики
+  document.getElementById('searchInput').addEventListener('input', filterClinics);
+  document.getElementById('specialtyFilter').addEventListener('change', filterClinics);
+  document.getElementById('nearbyBtn').addEventListener('click', findNearbyClinics);
+  document.getElementById('resetViewBtn').addEventListener('click', resetView);
+  document.getElementById('selectOnMapBtn').addEventListener('click', () => {
+      map.once('click', handleMapClick);
+      alert('Кликните на карте, чтобы указать ваше местоположение');
+  });
+  document.getElementById('clearLocationBtn').addEventListener('click', clearUserLocation);
+  document.getElementById('clearRouteBtn').addEventListener('click', clearRoute);
+
+  // Инициализация
+  displayClinics(clinicsData);
+  L.control.scale().addTo(map);
+
+  console.log('Карта загружена. Клиник найдено:', clinicsData.length);
+</script>
+</body>
+</html>

@@ -360,7 +360,7 @@
                 <i class="fas fa-stethoscope"></i>
                 <div>
                     <p>Направления</p>
-                    <p th:text="${clinic.specializations}">Терапия, Кардиология, Неврология</p>
+                    <p th:text="${clinic.type}">Терапия, Кардиология, Неврология</p>
                 </div>
             </div>
             <div class="info-card">
@@ -388,7 +388,7 @@
                     <div class="review-header">
                         <div class="reviewer-name">
                             <i class="fas fa-user-circle"></i>
-                            <span th:text="${review.commenter}">Анна П.</span>
+                            <span th:text="${review.author}">Анна П.</span>
                         </div>
                         <div class="review-stars" th:with="rating=${review.rating}">
                             <th:block th:each="i, iterStat : ${#numbers.sequence(1, 5)}">
@@ -399,23 +399,24 @@
                     </div>
                     <div class="review-date">
                         <i class="far fa-calendar-alt"></i>
-                        <span th:text="${#temporals.format(review.createdDate, 'dd.MM.yyyy')}">18.02.2025</span>
+                        <span th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy')}">18.02.2025</span>
                     </div>
                     <div class="review-text" th:text="${review.text}">Текст отзыва</div>
                 </div>
             </div>
         </div>
 
-        <!-- Форма добавления отзыва -->
         <div class="form-section">
             <div class="section-title" style="border-left-color: #f5b042; font-size: 1.3rem;">
                 <i class="fas fa-pen-alt"></i>
                 Оставить отзыв
             </div>
-            <form id="reviewForm" th:action="@{/leaveComment/{id}(id=${clinic.id})}" method="post">
+            <form id="reviewForm" th:action="@{/leaveComment}" method="post">
+                <input type="hidden" name="clinicId" th:value="${clinic.id}" />
+
                 <div class="form-group">
                     <label><i class="fas fa-user"></i> Ваше имя</label>
-                    <input type="text" name="commenter" placeholder="Например: Анна П." required>
+                    <input type="text" name="author" placeholder="Например: Анна П." required>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-star"></i> Оценка</label>
@@ -442,9 +443,6 @@
             </div>
         </div>
     </div>
-    <footer>
-        <i class="fas fa-heartbeat"></i> <span th:text="${clinic.license}">Лицензия ЛО-77-01-123456</span> | Современные технологии заботы о вашем здоровье
-    </footer>
 </div>
 
 <script>

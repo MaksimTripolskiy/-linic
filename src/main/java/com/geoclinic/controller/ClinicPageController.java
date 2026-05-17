@@ -51,11 +51,12 @@ public class ClinicPageController {
         return "create-clinic-map"; // вернуть ту же страницу с сообщением
     }
 
-    @GetMapping(value = "/getClinic")           // fixme
+    // todo ap 5/10 if no such clinic id, need 404 page
+    @GetMapping(value = "/getClinic")
     public String getClinic(@RequestParam(value = "id") Long id, Model model) {
 
         Clinic clinic = clinicService.getClinicById(id);
-        List<Comment> comments = commentService.getCommentsByClinicId(id);
+        List<Comment> comments = commentService.getApprovedCommentsByClinicId(id);
 
         model.addAttribute("clinic", clinic);
         model.addAttribute("reviews", comments);
@@ -76,7 +77,7 @@ public class ClinicPageController {
 
         System.out.println(clinicsJson);
 
-        return "map-view";
+        return "map-view-clickable2";
 
     }
 

@@ -32,6 +32,7 @@ public class ClinicService {
     }
 
     public void createClinic(Clinic clinic) {
+
         clinicDAO.save(clinic);
     }           // todo clinic exists?
 

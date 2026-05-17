@@ -3,6 +3,7 @@ package com.geoclinic.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalTime;
 import java.util.List;
 
 
@@ -26,9 +27,18 @@ public class Clinic {
     private double latitude;
     @Column(name="longitude")
     private double longitude;
+//    @Column(name="open_time")
+//    private LocalTime openTime;
+//    @Column(name="close_time")
+//    private LocalTime closeTime;
+    @Column(name="work_hours")
+    private String workHours;
 
-    @OneToMany(mappedBy = "clinic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Comment> reviews;
+
+    @OneToMany(mappedBy = "clinic",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<Comment> comments;
 
 
 //    @OneToOne

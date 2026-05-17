@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,6 +14,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
+@Service
 public class RouteService {
 
 
@@ -26,12 +28,11 @@ public class RouteService {
      */
 
     private static final String BASE_URL = "https://api.openrouteservice.org/v2/directions/foot-walking";            /// todo car or person?
-    private final String apiKey;
+    private final String API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijk5YWQ0OWNhNDc1NTRkOThiZDIxZGY5NjU0M2YzZGEyIiwiaCI6Im11cm11cjY0In0";
     private final HttpClient httpClient;
     private final Gson gson;
 
-    public RouteService(String apiKey) {
-        this.apiKey = apiKey;
+    public RouteService() {
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))
                 .build();
@@ -42,7 +43,7 @@ public class RouteService {
 
     public RouteResponse getRoute(double startLon, double startLat, double endLon, double endLat) throws Exception {
         String url = BASE_URL + "?start=" + startLon + "," + startLat +
-                "&end=" + endLon + "," + endLat + "&api_key=" + apiKey;
+                "&end=" + endLon + "," + endLat + "&api_key=" + API_KEY;
 
         System.out.println(url);
 
