@@ -1,6 +1,8 @@
 package com.geoclinic.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -34,8 +36,15 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "clinic_id", nullable = false)
+    @JsonBackReference
+//    @JsonIgnore
     private Clinic clinic;
 
     public Comment() {}
+
+    @Override
+    public String toString() {          // todo ap 5/10 remove without StackOverflow
+        return "temporary toString";
+    }
 
 }

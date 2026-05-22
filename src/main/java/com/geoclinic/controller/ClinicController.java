@@ -8,10 +8,10 @@ import com.geoclinic.service.ClinicService;
 import com.geoclinic.service.RouteService;
 import com.geoclinic.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class ClinicController {
@@ -24,7 +24,7 @@ public class ClinicController {
     private UserService userService;
 
 
-    @GetMapping(value = "/getAllClinics")
+    @GetMapping(value = "/getAllClinics")           // todo ap 3/10 remove
     public String getAllClinics() {
         return clinicService.getAllClinics().toString();
     }
@@ -52,6 +52,25 @@ public class ClinicController {
         }
         return response.getRawResponse();
     }
+
+    @GetMapping("/api/clinics/nearby")
+    public String findClinicsInRadius(@RequestParam(name = "lat") double lat,
+                                      @RequestParam(name = "lng") double lng,
+                                      @RequestParam(name = "radius") double radius) {
+        List<Clinic> clinicsNearPoint = clinicService.findClinicsInRadius(lat, lng, radius);
+
+        return clinicsNearPoint.toString();
+
+
+    }
+
+    @PostMapping("/delete/{id}")
+    @ResponseBody
+    public String deleteClinic(@PathVariable(name = "id") Long id) {
+            clinicService.deleteClinicById(id);
+            return "redirect:/manageClinics";
+    }
+
 
 //    @GetMapping(value = "/registerUser2")
 //    public String registerUser(Model model) {

@@ -39,6 +39,13 @@ public class ClinicPageController {
 
     }
 
+    @GetMapping("/manageClinics")
+    public String listClinics(Model model) {
+        List<Clinic> clinics = clinicService.getAllClinics();
+        model.addAttribute("clinics", clinics);
+        return "manage-clinics";
+    }
+
     @PostMapping("/createClinic")
     public String createClinic(@ModelAttribute Clinic clinic, Model model) {
         try {
@@ -75,7 +82,6 @@ public class ClinicPageController {
         String clinicsJson = mapper.writeValueAsString(clinicsList);
         model.addAttribute("clinicsJson", clinicsJson);
 
-        System.out.println(clinicsJson);
 
         return "map-view-clickable2";
 

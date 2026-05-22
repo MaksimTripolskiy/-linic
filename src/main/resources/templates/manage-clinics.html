@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Управление клиниками - Geoclinic</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    /* Стабильные стили для заголовков клиник */
+.clinic-item {
+    transition: background 0.2s ease; /* Плавный фон */
+}
+
+.clinic-item h4 {
+    /* Фиксированные параметры, которые не меняются при наведении */
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 0 0 5px;
+    padding: 0;
+    color: #667eea;
+
+    /* Плавное изменение цвета */
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.clinic-item h4:hover {
+    color: #5a67d8;  /* Только цвет */
+    cursor: pointer;
+    /* НЕ меняем: размер, жирность, отступы, margin, padding */
+}
+
+/* Опционально - легкий эффект при наведении на всю строку */
+.clinic-item:hover {
+    background: #f9f9f9;
+}
+
+/* Анимация для кнопок без мерцания */
+.btn-edit, .btn-delete, .btn-add {
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-edit:hover, .btn-delete:hover, .btn-add:hover {
+    transform: translateY(-1px); /* Легкий подъем вместо изменения размера */
+}
+
+.btn-edit:active, .btn-delete:active, .btn-add:active {
+    transform: translateY(0); /* Возврат при нажатии */
+}
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f5f5;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header h1 {
+        font-size: 24px;
+    }
+
+    .btn-add {
+        background: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-add:hover {
+        background: #218838;
+    }
+
+    /* Таблица */
+    .clinics-table {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: #667eea;
+        color: white;
+    }
+
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+
+    th {
+        font-weight: 600;
+    }
+
+    tr:hover {
+        background: #f9f9f9;
+    }
+
+    /* Координаты */
+    .coordinates {
+        font-family: monospace;
+        font-size: 12px;
+    }
+
+    /* Кнопки */
+    .btn-edit {
+        background: #ffc107;
+        color: #333;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-right: 5px;
+        transition: background 0.3s;
+    }
+
+    .btn-edit:hover {
+        background: #e0a800;
+    }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: background 0.3s;
+    }
+
+    .btn-delete:hover {
+        background: #c82333;
+    }
+
+    /* Статус */
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+
+    /* Модальное окно для удаления */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        max-width: 400px;
+        margin: 100px auto;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .modal-buttons {
+        margin-top: 20px;
+    }
+
+    .modal-buttons button {
+        margin: 0 10px;
+        padding: 8px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-confirm {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+    }
+
+    /* Сообщения */
+    .message {
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        display: none;
+    }
+
+    .message.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .message.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    /* Поиск */
+    .search-box {
+        margin-bottom: 20px;
+    }
+
+    .search-input {
+        width: 100%;
+        max-width: 300px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        th, td {
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 4px 8px;
+            font-size: 10px;
+        }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>🏥 Управление клиниками</h1>
+    <a href="/clinics/add" class="btn-add">➕ Добавить клинику</a>
+  </div>
+
+  <!-- Сообщения -->
+  <div id="message" class="message"></div>
+
+  <!-- Поиск -->
+  <div class="search-box">
+    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Поиск по названию или адресу...">
+  </div>
+
+  <!-- Таблица клиник -->
+  <div class="clinics-table">
+    <table id="clinicsTable">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Название</th>
+        <th>Адрес</th>
+        <th>Телефон</th>
+        <th>Тип</th>
+        <th>Координаты</th>
+        <th>Часы работы</th>
+        <th>Действия</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="clinic : ${clinics}" th:data-id="${clinic.id}">
+        <td th:text="${clinic.id}"></td>
+        <td class="clinic-name" th:text="${clinic.name}"></td>
+        <td class="clinic-address" th:text="${clinic.address}"></td>
+        <td class="clinic-phone" th:text="${clinic.phone}"></td>
+        <td class="clinic-type" th:text="${clinic.type}"></td>
+        <td class="coordinates">
+          <span th:text="${clinic.latitude}"></span>°,
+          <span th:text="${clinic.longitude}"></span>°
+        </td>
+        <td class="clinic-hours" th:text="${clinic.workHours}"></td>
+
+        <td>
+        <!-- Форма редактирования -->
+        <form th:action="@{/update/{id}(id=${clinic.id})}"
+              method="post"
+              style="display: inline-block;">
+          <button type="submit" class="btn-edit">✏️ Редактировать</button>
+        </form>
+
+        <!-- Форма удаления -->
+        <form th:action="@{/delete/{id}(id=${clinic.id})}"
+              method="post"
+              class="delete-form"
+              style="display: inline-block;">
+          <input type="hidden" name="_method" value="DELETE"/>
+          <button type="submit" class="btn-delete">🗑️ Удалить</button>
+        </form>
+
+        </td>
+
+
+
+
+      </tr>
+      <tr th:if="${#lists.isEmpty(clinics)}">
+        <td colspan="8" class="empty-state">
+          📭 Клиники не найдены
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Модальное окно удаления -->
+<div id="deleteModal" class="modal">
+  <div class="modal-content">
+    <h3>Подтверждение удаления</h3>
+    <p>Вы уверены, что хотите удалить клинику <strong id="deleteClinicName"></strong>?</p>
+    <p style="color: #dc3545; font-size: 12px; margin-top: 10px;">Это действие невозможно отменить!</p>
+    <div class="modal-buttons">
+      <button class="btn-confirm" id="confirmDeleteBtn">Удалить</button>
+      <button class="btn-cancel" id="cancelDeleteBtn">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Переменные
+  let currentDeleteId = null;
+  let currentDeleteName = null;
+
+  // Получение CSRF токена (если используется Spring Security)
+  function getCsrfToken() {
+      const token = document.querySelector('meta[name="_csrf"]');
+      const header = document.querySelector('meta[name="_csrf_header"]');
+      if (token && header) {
+          return { header: header.content, token: token.content };
+      }
+      return null;
+  }
+
+  // Показать сообщение
+  function showMessage(text, type) {
+      const messageDiv = document.getElementById('message');
+      messageDiv.textContent = text;
+      messageDiv.className = `message ${type}`;
+      messageDiv.style.display = 'block';
+
+      setTimeout(() => {
+          messageDiv.style.display = 'none';
+      }, 3000);
+  }
+
+  // Редактирование клиники
+  function editClinic(id) {
+      window.location.href = `/clinics/edit/${id}`;
+  }
+
+  // Удаление клиники
+  function deleteClinic(id, name) {
+      currentDeleteId = id;
+      currentDeleteName = name;
+      document.getElementById('deleteClinicName').textContent = name;
+      document.getElementById('deleteModal').style.display = 'block';
+  }
+
+  // Подтверждение удаления
+  async function confirmDelete() {
+      if (!currentDeleteId) return;
+
+      try {
+          const csrf = getCsrfToken();
+          const headers = {
+              'Content-Type': 'application/json'
+          };
+
+          if (csrf) {
+              headers[csrf.header] = csrf.token;
+          }
+
+          const response = await fetch(`/clinics/delete/${currentDeleteId}`, {
+              method: 'DELETE',
+              headers: headers
+          });
+
+          if (response.ok) {
+              showMessage(`Клиника "${currentDeleteName}" успешно удалена`, 'success');
+
+              // Удаляем строку из таблицы
+              const row = document.querySelector(`tr[data-id="${currentDeleteId}"]`);
+              if (row) {
+                  row.remove();
+              }
+
+              // Проверяем, остались ли клиники
+              const remainingRows = document.querySelectorAll('#clinicsTable tbody tr:not(.empty-state)');
+              if (remainingRows.length === 0) {
+                  const tbody = document.querySelector('#clinicsTable tbody');
+                  tbody.innerHTML = '<tr><td colspan="8" class="empty-state">📭 Клиники не найдены</td></tr>';
+              }
+          } else {
+              const error = await response.text();
+              showMessage(`Ошибка при удалении: ${error}`, 'error');
+          }
+      } catch (error) {
+          console.error('Ошибка:', error);
+          showMessage('Ошибка при удалении клиники', 'error');
+      } finally {
+          closeModal();
+      }
+  }
+
+  // Закрыть модальное окно
+  function closeModal() {
+      document.getElementById('deleteModal').style.display = 'none';
+      currentDeleteId = null;
+      currentDeleteName = null;
+  }
+
+  // Поиск и фильтрация
+  function filterClinics() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#clinicsTable tbody tr');
+
+      rows.forEach(row => {
+          if (row.classList.contains('empty-state')) return;
+
+          const name = row.querySelector('.clinic-name')?.textContent.toLowerCase() || '';
+          const address = row.querySelector('.clinic-address')?.textContent.toLowerCase() || '';
+
+          if (name.includes(searchTerm) || address.includes(searchTerm)) {
+              row.style.display = '';
+          } else {
+              row.style.display = 'none';
+          }
+      });
+  }
+
+  // Инициализация обработчиков
+  document.addEventListener('DOMContentLoaded', () => {
+      // Обработчики для кнопок редактирования
+      document.querySelectorAll('.btn-edit').forEach(btn => {
+          btn.addEventListener('click', () => {
+              const id = btn.getAttribute('data-id');
+              editClinic(id);
+          });
+      });
+
+      // Обработчики для кнопок удаления
+      document.querySelectorAll('.btn-delete').forEach(btn => {
+          btn.addEventListener('click', () => {
+              const id = btn.getAttribute('data-id');
+              const name = btn.closest('tr').querySelector('.clinic-name').textContent;
+              deleteClinic(id, name);
+          });
+      });
+
+      // Поиск
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+          searchInput.addEventListener('input', filterClinics);
+      }
+
+      // Модальное окно
+      document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDelete);
+      document.getElementById('cancelDeleteBtn').addEventListener('click', closeModal);
+
+      // Закрыть модальное окно при клике вне его
+      window.addEventListener('click', (event) => {
+          const modal = document.getElementById('deleteModal');
+          if (event.target === modal) {
+              closeModal();
+          }
+      });
+
+      // Показать сообщение если есть параметр в URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const message = urlParams.get('message');
+      if (message === 'deleted') {
+          showMessage('Клиника успешно удалена', 'success');
+      } else if (message === 'added') {
+          showMessage('Клиника успешно добавлена', 'success');
+      } else if (message === 'updated') {
+          showMessage('Клиника успешно обновлена', 'success');
+      }
+  });
+</script>
+</body>
+</html>

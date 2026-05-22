@@ -100,11 +100,11 @@
         width: 100%;
     }
 
-    .specialty-filter {
+    .type-filter {
         margin: 15px 0;
     }
 
-    .specialty-filter select {
+    .type-filter select {
         width: 100%;
         padding: 8px;
         border: 1px solid #ddd;
@@ -188,13 +188,14 @@
 
     <input type="text" id="searchInput" class="search-box" placeholder="Поиск по названию...">
 
-    <div class="specialty-filter">
-      <select id="specialtyFilter">
-        <option value="all">Все специальности</option>
-        <option value="dental">Стоматология</option>
-        <option value="cardiology">Кардиология</option>
-        <option value="pediatrics">Педиатрия</option>
-        <option value="ophthalmology">Офтальмология</option>
+    <div class="type-filter">
+      <select id="typeFilter">
+        <option value="all">All</option>
+        <option value="private">Private Clinic</option>
+        <option value="public">Public Hospital</option>
+        <option value="specialized">Specialized Clinic</option>
+        <option value="dental">Dental Clinic</option>
+        <option value="veterinary">Veterinary Clinic</option>
       </select>
     </div>
 
@@ -233,7 +234,7 @@
   const clinicsData = JSON.parse(/*[[${clinicsJson}]]*/ '[]');
 
   // Инициализация карты
-  const map = L.map('map').setView([55.751244, 37.618423], 12);
+  const map = L.map('map').setView([47.236389,  38.896944], 12);
 
   // Добавляем слой карты
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -316,9 +317,9 @@
           clinicDiv.innerHTML = `
               <h4>${clinic.name}</h4>
               <p>📍 ${clinic.address || 'Адрес не указан'}</p>
-              <p>🏥 ${clinic.specialty || 'Общая'}</p>
+              <p>🏥 ${clinic.type || 'Общая'}</p>
               <button onclick="buildRouteToClinic(${clinic.latitude}, ${clinic.longitude}, '${clinic.name.replace(/'/g, "\\'")}')"
-                      style="background: #28a745; padding: 5px; margin-top: 5px; font-size: 11px;">
+                      style="background: #28a745; <pa></pa>dding: 5px; margin-top: 5px; font-size: 11px;">
                   🚗 Построить маршрут
               </button>
           `;
@@ -358,8 +359,8 @@
           const requestBody = {
               startLat: userLocation.lat,
               startLng: userLocation.lng,
-              endLat: destLat,
-              endLng: destLng
+              destLat: destLat,
+              destLng: destLng
           };
 
           console.log('Отправка запроса на бэкэнд:', requestBody);
@@ -516,7 +517,7 @@
   // Фильтрация клиник
   function filterClinics() {
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      const specialty = document.getElementById('specialtyFilter').value;
+      const type = document.getElementById('typeFilter').value;
 
       let filtered = clinicsData;
 
@@ -527,9 +528,9 @@
           );
       }
 
-      if (specialty !== 'all') {
+      if (type !== 'all') {
           filtered = filtered.filter(clinic =>
-              clinic.specialty && clinic.specialty.toLowerCase() === specialty
+              clinic.type && clinic.type.toLowerCase() === type
           );
       }
 
@@ -653,7 +654,7 @@
 
   // Сброс вида
   function resetView() {
-      map.setView([55.751244, 37.618423], 12);
+      map.setView([47.236389,  38.896944], 12);
       if (!userMarker) {
           displayClinics(clinicsData);
       }
@@ -661,7 +662,7 @@
 
   // Добавляем обработчики
   document.getElementById('searchInput').addEventListener('input', filterClinics);
-  document.getElementById('specialtyFilter').addEventListener('change', filterClinics);
+  document.getElementById('typeFilter').addEventListener('change', filterClinics);
   document.getElementById('nearbyBtn').addEventListener('click', findNearbyClinics);
   document.getElementById('resetViewBtn').addEventListener('click', resetView);
   document.getElementById('selectOnMapBtn').addEventListener('click', () => {

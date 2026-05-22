@@ -1,5 +1,6 @@
 package com.geoclinic.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -38,6 +39,7 @@ public class Clinic {
     @OneToMany(mappedBy = "clinic",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
+    @JsonManagedReference
     private List<Comment> comments;
 
 

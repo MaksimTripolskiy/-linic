@@ -28,7 +28,7 @@ public class RouteService {
      */
 
     private static final String BASE_URL = "https://api.openrouteservice.org/v2/directions/foot-walking";            /// todo car or person?
-    private final String API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijk5YWQ0OWNhNDc1NTRkOThiZDIxZGY5NjU0M2YzZGEyIiwiaCI6Im11cm11cjY0In0";
+    private final String API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijk5YWQ0OWNhNDc1NTRkOThiZDIxZGY5NjU0M2YzZGEyIiwiaCI6Im11cm11cjY0In0=";
     private final HttpClient httpClient;
     private final Gson gson;
 

@@ -39,6 +39,13 @@ public class Main {
         ClinicService clinicService = context.getBean(ClinicService.class);
 
         Clinic clinic = new Clinic();
+        clinic.setId(777L);
+        clinic.setAddress("caddress");
+        clinic.setName("cname");
+        clinic.setLatitude(44.444444);
+        clinic.setLongitude(44.444444);
+        clinic.setPhone("328923789423");
+        clinic.setType("Dental");
         clinic.setWorkHours("10am-5pm test");
         clinicService.createClinic(clinic);
 
@@ -59,8 +66,8 @@ public class Main {
 
 
 
-//        String apiKey = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijk5YWQ0OWNhNDc1NTRkOThiZDIxZGY5NjU0M2YzZGEyIiwiaCI6Im11cm11cjY0In0=";
-//
+//        String apiKey = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjkyN2Q3OTA0ZTA5NDQ4OTVhZjRiNTI5MmM4Njc5NTkwIiwiaCI6Im11cm11cjY0In0";
+
 //        RouteService routeService = new RouteService();
 //
 //        try {

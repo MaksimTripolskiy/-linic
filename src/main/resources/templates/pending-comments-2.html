@@ -575,8 +575,8 @@
 
         commentCards.forEach(card => {
             let cardStatus = 'pending';
-            if (card.classList.contains('approved')) cardStatus = 'approved';
-            else if (card.classList.contains('rejected')) cardStatus = 'rejected';
+            if (card.classList.contains('APPROVED')) cardStatus = 'approved';
+            else if (card.classList.contains('REJECTED')) cardStatus = 'rejected';
 
             if (currentFilter === 'all' || cardStatus === currentFilter) {
                 card.style.display = 'block';
