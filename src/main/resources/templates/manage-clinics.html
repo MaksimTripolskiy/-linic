@@ -310,12 +310,18 @@
         <td class="clinic-hours" th:text="${clinic.workHours}"></td>
 
         <td>
-        <!-- Форма редактирования -->
-        <form th:action="@{/createClinic}"
-              method="post"
-              style="display: inline-block;">
-          <button type="submit" class="btn-edit">✏️ Редактировать</button>
-        </form>
+<!--        &lt;!&ndash; Форма редактирования &ndash;&gt;-->
+<!--        <form th:action="@{/createClinic}"-->
+<!--              method="post"-->
+<!--              style="display: inline-block;">-->
+<!--          <button type="submit" class="btn-edit">✏️ Редактировать</button>-->
+<!--        </form>-->
+
+          <form th:action="@{/createClinic(id=${clinic.id})}"
+                method="get"
+                style="display: inline-block;">
+            <button type="submit" class="btn-edit">✏️ Редактировать</button>
+          </form>
 
         <!-- Форма удаления -->
         <form th:action="@{/delete/{id}(id=${clinic.id})}"

@@ -32,31 +32,31 @@ public class Main {
 
         //---------
 
-        ClinicService clinicService = context.getBean(ClinicService.class);
-
-        Clinic clinic = new Clinic();
-        clinic.setId(777L);
-        clinic.setAddress("caddress");
-        clinic.setName("cname");
-        clinic.setLatitude(44.444444);
-        clinic.setLongitude(44.444444);
-        clinic.setPhone("328923789423");
-        clinic.setType("Dental");
-        clinic.setWorkHours("10am-5pm test");
-        clinicService.createClinic(clinic);
-
-        //---------
-
-        CommentService commentService = context.getBean(CommentService.class);
-
-        Comment comment = new Comment();
-        comment.setText("this is a comment");
-        comment.setAuthor("Me Author");
-        comment.setCreatedAt(LocalDateTime.now());
-        comment.setStatus("PENDING");
-        comment.setClinic(clinic);
-
-        commentService.addComment(comment);
+//        ClinicService clinicService = context.getBean(ClinicService.class);
+//
+//        Clinic clinic = new Clinic();
+//        clinic.setId(777L);
+//        clinic.setAddress("caddress");
+//        clinic.setName("cname");
+//        clinic.setLatitude(44.444444);
+//        clinic.setLongitude(44.444444);
+//        clinic.setPhone("328923789423");
+//        clinic.setType("Dental");
+//        clinic.setWorkHours("10am-5pm test");
+//        clinicService.createClinic(clinic);
+//
+//        //---------
+//
+//        CommentService commentService = context.getBean(CommentService.class);
+//
+//        Comment comment = new Comment();
+//        comment.setText("this is a comment");
+//        comment.setAuthor("Me Author");
+//        comment.setCreatedAt(LocalDateTime.now());
+//        comment.setStatus("PENDING");
+//        comment.setClinic(clinic);
+//
+//        commentService.addComment(comment);
 ;
         //---------
 

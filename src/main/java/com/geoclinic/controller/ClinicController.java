@@ -21,8 +21,6 @@ public class ClinicController {
     private RouteService routeService;
     @Autowired      // fixme
     private ClinicService clinicService;
-    @Autowired
-    private UserService userService;
 
 
     @GetMapping(value = "/getAllClinics")           // todo ap 3/10 remove
@@ -38,11 +36,7 @@ public class ClinicController {
 //    }
 
 
-    @PostMapping(value = "/registerUser")
-    public String registerUser(@RequestBody RegistrationRequest request) {
-        userService.registerNonAdminUser(request).toString();  // fixme
-        return "redirect:/page/getAllClinics";
-    }
+
 
     @PostMapping(value = "/api/route")
     public String getRoute(@RequestBody RouteCoordinates coords) {

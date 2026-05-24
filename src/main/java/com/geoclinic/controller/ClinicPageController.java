@@ -1,15 +1,15 @@
 package com.geoclinic.controller;
 
+import com.geoclinic.dto.RegistrationRequest;
 import com.geoclinic.model.Clinic;
 import com.geoclinic.model.Comment;
 import com.geoclinic.service.ClinicService;
 import com.geoclinic.service.CommentService;
+import com.geoclinic.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -20,6 +20,8 @@ public class ClinicPageController {
 
     private ClinicService clinicService;
     private CommentService commentService;
+    @Autowired
+    private UserService userService;
     private String string;
 
     public ClinicPageController(ClinicService clinicService, CommentService commentService) {
@@ -38,9 +40,27 @@ public class ClinicPageController {
         return string;
     }
 
+//    @GetMapping("/createClinic")
+//    public String getCreateClinicPage() {
+//        return "create-clinic-map";
+//    }
+
+    @PostMapping("/registerUser")
+    public String registerUser(@RequestBody RegistrationRequest request) {
+        userService.registerNonAdminUser(request);
+        return "redirect:/page/getAllClinics";
+    }
+
+
     @GetMapping("/createClinic")
-    public String getCreateClinicPage() {
-        return "create-clinic-map";
+    public String showClinicForm(@RequestParam(name = "id", required = false) Long id, Model model) {
+        if (id == null) {
+            model.addAttribute("clinic", new Clinic()); // пустой объект
+        } else {
+            Clinic existingClinic = clinicService.getClinicById(id); // загружаем клинику из БД
+            model.addAttribute("clinic", existingClinic);
+        }
+        return "create-clinic-map"; // имя твоего файла HTML
     }
 
     @GetMapping("/admin/manageClinics")

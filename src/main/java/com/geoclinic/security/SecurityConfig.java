@@ -31,6 +31,7 @@ public class SecurityConfig {
                         // Public endpoint - accessible to everyone
 //                        .requestMatchers("/getAllClinics").permitAll()
                         .requestMatchers("/").permitAll()
+                                .requestMatchers("/registerUser").permitAll()
                                 .requestMatchers("/login.html").permitAll()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
