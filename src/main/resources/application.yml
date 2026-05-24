@@ -7,5 +7,5 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create  # Creates tables on startup, drops on shutdown
+#      ddl-auto: create  # Creates tables on startup, drops on shutdown
     show-sql: true           # Shows SQL statements (helpful for debugging)

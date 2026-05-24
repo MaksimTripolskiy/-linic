@@ -16,7 +16,28 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User registerNewUser(RegistrationRequest request) {
+    public User registerNonAdminUser(RegistrationRequest request) {
+        // Check if username already exists
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Username already exists");
+        }
+
+//        // Check if email already exists (optional)
+//        if (userRepository.existsByEmail(request.getEmail())) {
+//            throw new RuntimeException("Email already registered");
+//        }
+
+        // Create new user
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole("USER");  // Default role
+        user.setEnabled(true);  // Or false if email verification required
+
+        return userRepository.save(user);
+    }
+
+    public User registerAdminUser(RegistrationRequest request) {
         // Check if username already exists
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username already exists");

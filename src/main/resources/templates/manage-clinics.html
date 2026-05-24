@@ -270,7 +270,7 @@
   <!-- Header -->
   <div class="header">
     <h1>🏥 Управление клиниками</h1>
-    <a href="/clinics/add" class="btn-add">➕ Добавить клинику</a>
+    <a href="/createClinic" class="btn-add">➕ Добавить клинику</a>
   </div>
 
   <!-- Сообщения -->
@@ -311,7 +311,7 @@
 
         <td>
         <!-- Форма редактирования -->
-        <form th:action="@{/update/{id}(id=${clinic.id})}"
+        <form th:action="@{/createClinic}"
               method="post"
               style="display: inline-block;">
           <button type="submit" class="btn-edit">✏️ Редактировать</button>

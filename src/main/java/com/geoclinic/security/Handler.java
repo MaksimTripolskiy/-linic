@@ -25,20 +25,10 @@ public class Handler implements AuthenticationSuccessHandler {
 
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
 
-//        if (roles.contains("ROLE_ADMIN")) {           TODO restore
-//            response.sendRedirect("/createClinic");
-//        } else if (roles.contains("ROLE_USER")) {
-//            response.sendRedirect("/getAllClinics");
-//        } else {
-////            response.sendRedirect("/dashboard");
-//
-//            System.out.println("""
-//
-//
-//                    WHO IS THIS USER???
-//
-//
-//                    """);
-//        }
+        if (roles.contains("ROLE_ADMIN")) {
+            response.sendRedirect("/admin/getAllClinics");
+        } else if (roles.contains("ROLE_USER")) {
+            response.sendRedirect("/user/getAllClinics");
+        }
     }
 }

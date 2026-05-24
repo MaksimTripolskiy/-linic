@@ -183,8 +183,8 @@
     </div>
 
     <div class="form-group">
-      <label for="workingHours">Working Hours</label>
-      <input type="text" id="workingHours" name="workingHours" placeholder="e.g., 9:00 AM - 6:00 PM">
+      <label for="workHours">Working Hours</label>
+      <input type="text" id="workHours" name="workHours" placeholder="e.g., 9:00 AM - 6:00 PM">
     </div>
 
     <!-- Map Section -->
@@ -205,11 +205,6 @@
       </div>
     </div>
 
-    <div class="form-group">
-      <label for="description">Description</label>
-      <textarea id="description" name="description" placeholder="Enter clinic description..."></textarea>
-    </div>
-
     <button type="submit">Submit Clinic Information</button>
   </form>
 
@@ -227,8 +222,8 @@
   let marker;
 
   // Default coordinates (Moscow)
-  const defaultLat = 55.751244;
-  const defaultLng = 37.618423;
+  const defaultLat = 47.236389;
+  const defaultLng = 38.896944;
 
   // Initialize map when page loads
   document.addEventListener('DOMContentLoaded', function() {
@@ -337,7 +332,7 @@
           city: document.getElementById('city').value,
           phone: document.getElementById('phone').value,
           type: document.getElementById('clinicType').value,
-          workingHours: document.getElementById('workingHours').value,
+          workHours: document.getElementById('workHours').value,
           latitude: parseFloat(document.getElementById('latitude').value),
           longitude: parseFloat(document.getElementById('longitude').value),
           description: document.getElementById('description').value,

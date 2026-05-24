@@ -177,9 +177,31 @@
 </head>
 <body>
 <div class="header">
-  <h1>🏥 Geoclinic - Карта медицинских центров</h1>
-  <p>Найдите ближайшие клиники и постройте маршрут</p>
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1>🏥 Geoclinic - Карта медицинских центров</h1>
 
+    <div style="display: flex; gap: 10px;">
+      <form th:action="@{/admin/manageClinics}" method="get">
+        <button type="submit" style="background: #28a745; padding: 5px 10px; font-size: 18px; width: 150px;">
+          Управление клиниками
+        </button>
+      </form>
+
+      <form th:action="@{/createClinic}" method="get">
+        <button type="submit" style="background: #28a745; padding: 5px 10px; font-size: 18px; width: 150px;">
+          Создание новой клиники
+        </button>
+      </form>
+
+      <form th:action="@{/getAllCommentsAsAdmin}" method="get">
+        <button type="submit" style="background: #28a745; padding: 5px 10px; font-size: 18px; width: 150px;">
+          Управление комментариями
+        </button>
+      </form>
+    </div>
+    <h1></h1>
+  </div>
+  <p>Найдите ближайшие клиники и постройте маршрут</p>
 
 </div>
 
@@ -201,7 +223,7 @@
       </select>
     </div>
 
-<!--    <button id="nearbyBtn">📍 Показать ближайшие (GPS)</button>-->
+    <!--    <button id="nearbyBtn">📍 Показать ближайшие (GPS)</button>-->
     <button id="selectOnMapBtn">🗺️ Указать на карте</button>
     <button id="clearLocationBtn" style="background: #999;">❌ Очистить маркер</button>
     <button id="resetViewBtn">🗺️ Сбросить вид</button>
@@ -274,7 +296,7 @@
               marker.options.clinicId = clinic.id;
               marker.options.clinic = clinic;
 
-               // Содержимое всплывающего окна с кнопкой построения маршрута
+              // Содержимое всплывающего окна с кнопкой построения маршрута
               const popupContent = `
                   <div style="min-width: 250px;">
                       <h4 style="margin: 0 0 5px; color: #667eea;">${clinic.name}</h4>

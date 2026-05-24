@@ -7,10 +7,11 @@ import com.geoclinic.model.RouteResponse;
 import com.geoclinic.service.ClinicService;
 import com.geoclinic.service.RouteService;
 import com.geoclinic.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -39,7 +40,8 @@ public class ClinicController {
 
     @PostMapping(value = "/registerUser")
     public String registerUser(@RequestBody RegistrationRequest request) {
-        return userService.registerNewUser(request).toString();  // fixme
+        userService.registerNonAdminUser(request).toString();  // fixme
+        return "redirect:/page/getAllClinics";
     }
 
     @PostMapping(value = "/api/route")
@@ -64,11 +66,20 @@ public class ClinicController {
 
     }
 
+//    @PostMapping("/delete/{id}")
+//    public String deleteClinic(@PathVariable(name = "id") Long id) {
+//            clinicService.deleteClinicById(id);
+//            return "redirect:/admin/manageClinics";
+//    }
+
     @PostMapping("/delete/{id}")
-    @ResponseBody
-    public String deleteClinic(@PathVariable(name = "id") Long id) {
-            clinicService.deleteClinicById(id);
-            return "redirect:/manageClinics";
+    public void deleteClinic(@PathVariable(name = "id") Long id, HttpServletResponse response) {
+        clinicService.deleteClinicById(id);
+        try {
+            response.sendRedirect("/admin/manageClinics");
+        } catch (IOException e) {
+            throw new RuntimeException(e);     // todo ap 5/10
+        }
     }
 
 

@@ -30,7 +30,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         // Public endpoint - accessible to everyone
 //                        .requestMatchers("/getAllClinics").permitAll()
-                        .requestMatchers("/registerUser").permitAll()
+                        .requestMatchers("/").permitAll()
+                                .requestMatchers("/login.html").permitAll()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/manage/**").hasRole("ADMIN")
@@ -40,6 +41,7 @@ public class SecurityConfig {
                 )
 
                 .formLogin(form -> form
+//                        .loginPage("/registerUser2")
                         .successHandler(successHandler)
                         .permitAll()
                 )

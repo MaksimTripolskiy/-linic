@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -21,25 +20,30 @@ public class ClinicPageController {
 
     private ClinicService clinicService;
     private CommentService commentService;
+    private String string;
 
     public ClinicPageController(ClinicService clinicService, CommentService commentService) {
         this.clinicService = clinicService;
         this.commentService = commentService;
     }
 
-    @GetMapping("/registerUser2")
+
+    @GetMapping
     public String registerUser() {
         return "register-user";
+    }
 
+    @GetMapping("/login")
+    public String getLogin() {
+        return string;
     }
 
     @GetMapping("/createClinic")
     public String getCreateClinicPage() {
         return "create-clinic-map";
-
     }
 
-    @GetMapping("/manageClinics")
+    @GetMapping("/admin/manageClinics")
     public String listClinics(Model model) {
         List<Clinic> clinics = clinicService.getAllClinics();
         model.addAttribute("clinics", clinics);
@@ -72,8 +76,23 @@ public class ClinicPageController {
     }
 
 
-    @GetMapping(value = "/page/getAllClinics")
-    public String getAllClinics(Model model) {
+    @GetMapping(value = "/admin/getAllClinics")
+    public String getAllClinicsAsAdmin(Model model) {
+        List<Clinic> clinicsList = clinicService.getAllClinics();
+
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String clinicsJson = mapper.writeValueAsString(clinicsList);
+        model.addAttribute("clinicsJson", clinicsJson);
+
+
+        return "map-view-clickable-admin";
+
+    }
+
+    @GetMapping(value = "/user/getAllClinics")
+    public String getAllClinicsAsUser(Model model) {
         List<Clinic> clinicsList = clinicService.getAllClinics();
 
 
