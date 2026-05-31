@@ -152,7 +152,7 @@
 </head>
 <body>
 <div class="container">
-  <h1>🏥 Clinic Information Form</h1>
+  <h1>🏥 Информационная форма клиники</h1>
 
 <!--  <form id="clinicForm" th:action="@{/createClinic}" th:method="post">-->
 <!--    <div class="form-group">-->
@@ -210,22 +210,22 @@
 
   <form id="clinicForm" th:action="@{/createClinic}" th:method="post" th:object="${clinic}">
     <div class="form-group">
-      <label for="name">Clinic Name *</label>
+      <label for="name">Название клиники *</label>
       <input type="text" id="name" th:field="*{name}" required placeholder="Enter clinic name">
     </div>
 
     <div class="form-group">
-      <label for="address">Address *</label>
+      <label for="address">Адрес *</label>
       <input type="text" id="address" th:field="*{address}" required placeholder="Enter full address">
     </div>
 
     <div class="form-group">
-      <label for="phone">Phone Number *</label>
+      <label for="phone">Номер телефона *</label>
       <input type="tel" id="phone" th:field="*{phone}" required placeholder="+7 (XXX) XXX-XX-XX">
     </div>
 
     <div class="form-group">
-      <label for="type">Clinic Type *</label>
+      <label for="type">Тип клиники *</label>
       <select id="type" th:field="*{type}" required>
         <option value="">Select type</option>
         <option value="private">Private Clinic</option>
@@ -237,7 +237,7 @@
     </div>
 
     <div class="form-group">
-      <label for="workHours">Working Hours</label>
+      <label for="workHours">Часы работы</label>
       <input type="text" id="workHours" th:field="*{workHours}" placeholder="e.g., 9:00 AM - 6:00 PM">
     </div>
 
@@ -250,15 +250,15 @@
 
       <!-- Coordinates -->
     <div class="form-group">
-      <label for="latitude">Latitude (Широта)</label>
+      <label for="latitude">Широта</label>
       <input type="number" id="latitude" th:field="*{latitude}" step="any" placeholder="e.g., 55.751244">
     </div>
     <div class="form-group">
-      <label for="longitude">Longitude (Долгота)</label>
+      <label for="longitude">Долгота</label>
       <input type="number" id="longitude" th:field="*{longitude}" step="any" placeholder="e.g., 37.618423">
     </div>
 
-      <button type="submit">Submit Clinic Information</button>
+      <button type="submit">Создать клинику</button>
   </form>
 
   <div th:if="${message}" th:text="${message}" class="success"></div>
