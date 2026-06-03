@@ -286,6 +286,10 @@
                               style="background: #28a745; padding: 5px 10px; font-size: 12px;">
                           🚗 Построить маршрут
                       </button>
+                      <button onclick="buildRouteToClinic(${clinic.latitude}, ${clinic.longitude}, '${clinic.name.replace(/'/g, "\\'")}')"
+                              style="background: #28a745; padding: 5px 10px; font-size: 12px;">
+                          Добавить в избранное
+                      </button>
                       <a href="/getClinic?id=${clinic.id}" style="color: #667eea; margin-left: 10px;">Подробнее →</a>
                   </div>
               `;

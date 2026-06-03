@@ -9,10 +9,15 @@ import com.geoclinic.service.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.time.LocalDateTime;
 
 @SpringBootApplication
+@ComponentScan(basePackages = {"com.geoclinic"}) // Укажите явно пакеты
+//@EntityScan(basePackages = {"com.geoclinic.model"})
+@EnableJpaRepositories(basePackages = {"com.geoclinic"})
 public class Main {
 
 
@@ -21,14 +26,14 @@ public class Main {
 
 
 
-        RegistrationRequest req = new RegistrationRequest();
-        req.setUsername("admin");
-        req.setPassword("pass");
-
-        UserService service = context.getBean(UserService.class);
-
-
-        service.registerAdminUser(req);
+//        RegistrationRequest req = new RegistrationRequest();
+//        req.setUsername("admin");
+//        req.setPassword("pass");
+//
+//        UserService service = context.getBean(UserService.class);
+//
+//
+//        service.registerAdminUser(req);
 
         //---------
 
