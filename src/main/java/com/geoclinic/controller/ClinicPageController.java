@@ -3,16 +3,26 @@ package com.geoclinic.controller;
 import com.geoclinic.dto.RegistrationRequest;
 import com.geoclinic.model.Clinic;
 import com.geoclinic.model.Comment;
+import com.geoclinic.model.Profile;
+import com.geoclinic.model.User;
 import com.geoclinic.service.ClinicService;
 import com.geoclinic.service.CommentService;
+import com.geoclinic.service.ProfileService;
 import com.geoclinic.service.UserService;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -22,9 +32,10 @@ public class ClinicPageController {
     private CommentService commentService;
     @Autowired
     private UserService userService;
+    private ProfileService profileService;
     private String string;
 
-    public ClinicPageController(ClinicService clinicService, CommentService commentService) {
+    public ClinicPageController(ClinicService clinicService, CommentService commentService, ProfileService profileService) {
         this.clinicService = clinicService;
         this.commentService = commentService;
     }
@@ -47,8 +58,9 @@ public class ClinicPageController {
 
     @PostMapping("/registerUser")
     public String registerUser(@RequestBody RegistrationRequest request) {
-        userService.registerNonAdminUser(request);
-        return "redirect:/page/getAllClinics";
+        User user = userService.registerNonAdminUser(request);
+
+        return "redirect:/user/getAllClinics";
     }
 
 
@@ -60,7 +72,7 @@ public class ClinicPageController {
             Clinic existingClinic = clinicService.getClinicById(id); // загружаем клинику из БД
             model.addAttribute("clinic", existingClinic);
         }
-        return "create-clinic-map"; // имя твоего файла HTML
+        return "create-clinic-map";
     }
 
     @GetMapping("/admin/manageClinics")
@@ -120,6 +132,26 @@ public class ClinicPageController {
 
         String clinicsJson = mapper.writeValueAsString(clinicsList);
         model.addAttribute("clinicsJson", clinicsJson);
+
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+
+
+        Map<String, Object> profileDto = new HashMap<>();
+        Profile profile = user.getProfile();
+
+//        Hibernate.initialize(profile.getFavoriteClinics());
+
+        profileDto.put("id", profile.getId());
+        profileDto.put("age", profile.getAge());
+        profileDto.put("name", profile.getName());
+        profileDto.put("gender", profile.getGender());
+
+
+
+        String profileJson = mapper.writeValueAsString(profileDto);
+        model.addAttribute("profile", profileJson);
 
 
         return "map-view-clickable2";

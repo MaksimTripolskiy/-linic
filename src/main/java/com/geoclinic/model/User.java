@@ -25,6 +25,11 @@ public class User implements UserDetails {
 
     private boolean enabled = true;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY, optional = false)
+    private Profile profile;
+
+
     // Constructors
     public User() {}
 
@@ -83,6 +88,14 @@ public class User implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setProfile(Profile profile) {
+        this.profile = profile;
+    }
+
+    public Profile getProfile() {
+        return profile;
     }
 
     @Override

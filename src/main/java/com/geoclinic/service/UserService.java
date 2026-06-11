@@ -1,11 +1,15 @@
 package com.geoclinic.service;
 
 import com.geoclinic.dto.RegistrationRequest;
+import com.geoclinic.model.Clinic;
+import com.geoclinic.model.Profile;
 import com.geoclinic.model.User;
 import com.geoclinic.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
 
 @Service
 public class UserService {
@@ -15,6 +19,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ProfileService profileService;
 
     public User registerNonAdminUser(RegistrationRequest request) {
         // Check if username already exists
@@ -34,7 +41,15 @@ public class UserService {
         user.setRole("USER");  // Default role
         user.setEnabled(true);  // Or false if email verification required
 
-        return userRepository.save(user);
+
+        Profile profile = new Profile(null, request.getUsername(), null, null, new HashSet<Clinic>(), user);
+        user.setProfile(profile);
+
+        User savedUser = userRepository.save(user);
+
+        profileService.createProfile(profile);
+
+        return savedUser;
     }
 
     public User registerAdminUser(RegistrationRequest request) {

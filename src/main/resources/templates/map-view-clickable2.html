@@ -234,12 +234,13 @@
 <script th:inline="javascript">
   // Данные клиник из Spring Model
   const clinicsData = JSON.parse(/*[[${clinicsJson}]]*/ '[]');
+  const profile = JSON.parse(/*[[${profile}]]*/ '[]');
 
   // Инициализация карты
   const map = L.map('map').setView([47.236389,  38.896944], 12);
 
   // Добавляем слой карты
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map);
 
@@ -286,10 +287,23 @@
                               style="background: #28a745; padding: 5px 10px; font-size: 12px;">
                           🚗 Построить маршрут
                       </button>
-                      <button onclick="buildRouteToClinic(${clinic.latitude}, ${clinic.longitude}, '${clinic.name.replace(/'/g, "\\'")}')"
-                              style="background: #28a745; padding: 5px 10px; font-size: 12px;">
-                          Добавить в избранное
-                      </button>
+<!--                      <button onclick="buildRouteToClinic(${clinic.latitude}, ${clinic.longitude}, '${clinic.name.replace(/'/g, "\\'")}')"-->
+<!--                              style="background: #28a745; padding: 5px 10px; font-size: 12px;">-->
+<!--                          Добавить в избранное-->
+<!--                      </button>-->
+
+<!--                      <form th:action="@{/createFavorite?clinicId={id1}(id1=${clinic.id})&profileId={id2}(id2=${profile.id})}"-->
+<!--                           style="display: inline-block;">-->
+<!--&lt;!&ndash;                      <input type="hidden" name="_method" value="DELETE"/>&ndash;&gt;-->
+<!--                      <button type="submit" style="background: #28a745; padding: 5px 10px; font-size: 12px;">Добавить в избранное</button>-->
+<!--                    </form>-->
+
+<!-- Удалите th:action и используйте обычный переход -->
+<a href="/createFavorite?clinicId=${clinic.id}&profileId=${profile.id}"
+   style="background: #ffc107; padding: 5px 10px; font-size: 12px; text-decoration: none; color: black; display: inline-block; border-radius: 5px;">
+    ⭐ Добавить в избранное
+</a>
+
                       <a href="/getClinic?id=${clinic.id}" style="color: #667eea; margin-left: 10px;">Подробнее →</a>
                   </div>
               `;

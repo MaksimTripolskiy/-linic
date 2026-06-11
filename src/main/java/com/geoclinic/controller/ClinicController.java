@@ -1,12 +1,10 @@
 package com.geoclinic.controller;
 
-import com.geoclinic.dto.RegistrationRequest;
 import com.geoclinic.model.Clinic;
 import com.geoclinic.model.RouteCoordinates;
 import com.geoclinic.model.RouteResponse;
 import com.geoclinic.service.ClinicService;
 import com.geoclinic.service.RouteService;
-import com.geoclinic.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -75,6 +73,7 @@ public class ClinicController {
             throw new RuntimeException(e);     // todo ap 5/10
         }
     }
+
 
 
 //    @GetMapping(value = "/registerUser2")

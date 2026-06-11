@@ -1,7 +1,9 @@
 package com.geoclinic.service;
 
 import com.geoclinic.model.Clinic;
+import com.geoclinic.model.Profile;
 import com.geoclinic.repository.ClinicDAO;
+import com.geoclinic.repository.ProfileDAO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,9 +12,11 @@ import java.util.List;
 public class ClinicService {
 
     private ClinicDAO clinicDAO;
+    private ProfileDAO profileDAO;
 
-    public ClinicService(ClinicDAO clinicDAO) {
+    public ClinicService(ClinicDAO clinicDAO, ProfileDAO profileDAO) {
         this.clinicDAO = clinicDAO;
+        this.profileDAO = profileDAO;
     }
 
     public Clinic getClinicById(long id) {
@@ -70,4 +74,6 @@ public class ClinicService {
         return filteredClinics;
 
     }
+
+
 }

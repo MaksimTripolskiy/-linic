@@ -192,47 +192,42 @@
 <body>
 <div class="profile-card">
   <div class="profile-header">
-    <div class="profile-name" th:text="${user.fullName}">Иван Иванов</div>
-    <div class="profile-username" th:text="'@' + ${user.username}">@ivanov_i</div>
-    <div>
-      <span class="profile-gender" th:text="${user.gender != null ? user.gender : 'Не указан'}">Мужской</span>
-      <span class="profile-age" th:text="${user.age != null ? user.age + ' лет' : 'Возраст не указан'}">30 лет</span>
-    </div>
+    <div class="profile-name" th:text="${profile.name}">Иван Иванов</div>
   </div>
 
   <div class="profile-body">
     <!-- Дополнительная информационная сетка (дублируем для наглядности) -->
     <div class="info-grid">
-      <div class="info-item">
-        <div class="info-label">Полное имя</div>
-        <div class="info-value" th:text="${user.fullName}">Иван Иванов</div>
-      </div>
+<!--      <div class="info-item">-->
+<!--        <div class="info-label">Полное имя</div>-->
+<!--        <div class="info-value" th:text="${user.fullName}">Иван Иванов</div>-->
+<!--      </div>-->
       <div class="info-item">
         <div class="info-label">Имя пользователя</div>
-        <div class="info-value" th:text="${'@' + user.username}">@ivanov_i</div>
+        <div class="info-value" th:text="${profile.name != null ? profile.name : '—'}">@ivanov_i</div>
       </div>
       <div class="info-item">
         <div class="info-label">Пол</div>
-        <div class="info-value" th:text="${user.gender != null ? user.gender : '—'}">Мужской</div>
+        <div class="info-value" th:text="${profile.gender != null ? profile.gender : '—'}">Мужской</div>
       </div>
       <div class="info-item">
         <div class="info-label">Возраст</div>
-        <div class="info-value" th:text="${user.age != null ? user.age + ' лет' : '—'}">30 лет</div>
+        <div class="info-value" th:text="${profile.age != null ? profile.age + ' лет' : '—'}">30 лет</div>
       </div>
     </div>
 
     <div class="section-title">Избранные клиники</div>
 
-    <!-- Список избранных клиник -->
-    <ul class="clinics-list" th:if="${not #lists.isEmpty(user.favoriteClinics)}">
-      <li th:each="clinic : ${user.favoriteClinics}" class="clinic-item">
-        <!-- Ссылка на отдельную HTML-страницу клиники, например /clinics/{id} или /clinic.html?id=... -->
-        <!-- Атрибут th:href формируется динамически -->
-        <a th:href="@{/clinic/{id}(id=${clinic.id})}" class="clinic-link">
-          <span class="clinic-name" th:text="${clinic.name}">Вита</span>
-        </a>
-      </li>
-    </ul>
+<!--    &lt;!&ndash; Список избранных клиник &ndash;&gt;-->
+<!--    <ul class="clinics-list" th:if="${not #lists.isEmpty(profile.favoriteClinics)}">-->
+<!--      <li th:each="clinic : ${profile.favoriteClinics}" class="clinic-item">-->
+<!--        &lt;!&ndash; Ссылка на отдельную HTML-страницу клиники, например /clinics/{id} или /clinic.html?id=... &ndash;&gt;-->
+<!--        &lt;!&ndash; Атрибут th:href формируется динамически &ndash;&gt;-->
+<!--        <a th:href="@{/clinic/{id}(id=${clinic.id})}" class="clinic-link">-->
+<!--          <span class="clinic-name" th:text="${clinic.name}">Вита</span>-->
+<!--        </a>-->
+<!--      </li>-->
+<!--    </ul>-->
   </div>
 </div>
 </body>

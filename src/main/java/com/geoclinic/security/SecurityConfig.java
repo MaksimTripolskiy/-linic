@@ -35,7 +35,6 @@ public class SecurityConfig {
                                 .requestMatchers("/login.html").permitAll()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/manage/**").hasRole("ADMIN")
 
                         // Any other request requires authentication
                         .anyRequest().authenticated()

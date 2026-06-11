@@ -1,11 +1,14 @@
 package com.geoclinic.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Data
@@ -41,6 +44,15 @@ public class Clinic {
             orphanRemoval = true)
     @JsonManagedReference
     private List<Comment> comments;
+
+    @ManyToMany
+    @JoinTable(
+            name = "favorite_clinics",
+            joinColumns = @JoinColumn(name = "clinic_id"),
+            inverseJoinColumns = @JoinColumn(name = "profile_id")
+    )
+    @JsonIgnore         // todo ap 7/10
+    private Set<Profile> profiles = new HashSet<>();
 
 
 //    @OneToOne
