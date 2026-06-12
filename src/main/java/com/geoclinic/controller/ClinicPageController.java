@@ -141,7 +141,7 @@ public class ClinicPageController {
         Map<String, Object> profileDto = new HashMap<>();
         Profile profile = user.getProfile();
 
-//        Hibernate.initialize(profile.getFavoriteClinics());
+//        Hibernate.initialize(profile.getFavoriteClinics()); //
 
         profileDto.put("id", profile.getId());
         profileDto.put("age", profile.getAge());
@@ -151,7 +151,7 @@ public class ClinicPageController {
 
 
         String profileJson = mapper.writeValueAsString(profileDto);
-        model.addAttribute("profile", profile);
+        model.addAttribute("profile", profileJson);
 
 
         return "map-view-clickable2";
