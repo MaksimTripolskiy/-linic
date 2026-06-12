@@ -26,7 +26,7 @@ public class Profile {
     @Column(name = "gender")
     private String gender;
 
-    @ManyToMany(mappedBy = "profiles")
+    @ManyToMany(mappedBy = "profiles", fetch = FetchType.EAGER)
     private Set<Clinic> favoriteClinics;
 
     @OneToOne(fetch = FetchType.EAGER)

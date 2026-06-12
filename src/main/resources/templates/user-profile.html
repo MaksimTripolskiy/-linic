@@ -218,16 +218,16 @@
 
     <div class="section-title">Избранные клиники</div>
 
-<!--    &lt;!&ndash; Список избранных клиник &ndash;&gt;-->
-<!--    <ul class="clinics-list" th:if="${not #lists.isEmpty(profile.favoriteClinics)}">-->
-<!--      <li th:each="clinic : ${profile.favoriteClinics}" class="clinic-item">-->
-<!--        &lt;!&ndash; Ссылка на отдельную HTML-страницу клиники, например /clinics/{id} или /clinic.html?id=... &ndash;&gt;-->
-<!--        &lt;!&ndash; Атрибут th:href формируется динамически &ndash;&gt;-->
-<!--        <a th:href="@{/clinic/{id}(id=${clinic.id})}" class="clinic-link">-->
-<!--          <span class="clinic-name" th:text="${clinic.name}">Вита</span>-->
-<!--        </a>-->
-<!--      </li>-->
-<!--    </ul>-->
+    <!-- Список избранных клиник -->
+    <ul class="clinics-list" th:if="${not #lists.isEmpty(profile.favoriteClinics)}">
+      <li th:each="clinic : ${profile.favoriteClinics}" class="clinic-item">
+        <!-- Ссылка на отдельную HTML-страницу клиники, например /clinics/{id} или /clinic.html?id=... -->
+        <!-- Атрибут th:href формируется динамически -->
+        <a th:href="@{/getClinic?id={id}(id=${clinic.id})}" class="clinic-link">
+          <span class="clinic-name" th:text="${clinic.name}">Вита</span>
+        </a>
+      </li>
+    </ul>
   </div>
 </div>
 </body>
