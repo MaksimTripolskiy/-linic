@@ -151,7 +151,7 @@ public class ClinicPageController {
 
 
         String profileJson = mapper.writeValueAsString(profileDto);
-        model.addAttribute("profile", profileJson);
+        model.addAttribute("profile", profile);
 
 
         return "map-view-clickable2";

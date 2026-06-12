@@ -26,6 +26,87 @@
         padding: 20px;
     }
 
+    /* Стили для контейнера заголовка */
+    .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .header-title {
+        flex: 1;
+    }
+
+    .header-title h1 {
+        margin: 0 0 5px 0;
+    }
+
+    /* Контейнер для кнопок */
+    .header-buttons {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    /* Стили для кнопок в хедере */
+    .header-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-width: 150px;
+        color: white;
+    }
+
+    .header-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .header-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Зеленая кнопка профиля */
+    .profile-btn {
+        background: #28a745;
+        border-color: #28a745;
+    }
+
+    .profile-btn:hover {
+        background: #218838;
+        border-color: #218838;
+    }
+
+    /* Красная кнопка выхода */
+    .logout-btn {
+        background: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .logout-btn:hover {
+        background: #c82333;
+        border-color: #c82333;
+    }
+
+    .header-subtitle {
+        opacity: 0.9;
+        font-size: 16px;
+    }
+
     .main-container {
         display: flex;
         padding: 20px;
@@ -172,15 +253,48 @@
             width: 100%;
             max-height: 400px;
         }
+
+        .header-top {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .header-buttons {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .header-btn {
+            flex: 1;
+        }
     }
   </style>
 </head>
 <body>
 <div class="header">
-  <h1>🏥 Geoclinic - Карта медицинских центров</h1>
-  <p>Найдите ближайшие клиники и постройте маршрут</p>
+  <div class="header-top">
+    <div class="header-title">
+      <h1>🏥 Geoclinic - Карта медицинских центров</h1>
+    </div>
+    <div class="header-buttons">
+      <form th:action="@{/getProfile}" method="get" style="margin: 0;">
+        <button type="submit" class="header-btn profile-btn">
+          👤 Мой профиль
+        </button>
+      </form>
 
-
+      <form th:action="@{/logout}" method="get" style="margin: 0;">
+        <button type="submit" class="header-btn logout-btn">
+          🚪 Выйти из профиля
+        </button>
+      </form>
+    </div>
+  </div>
+  <div class="header-subtitle">
+    <h2>
+      <p>Найдите ближайшие клиники и постройте маршрут</p>
+    </h2>
+  </div>
 </div>
 
 <div class="main-container">
@@ -201,7 +315,6 @@
       </select>
     </div>
 
-<!--    <button id="nearbyBtn">📍 Показать ближайшие (GPS)</button>-->
     <button id="selectOnMapBtn">🗺️ Указать на карте</button>
     <button id="clearLocationBtn" style="background: #999;">❌ Очистить маркер</button>
     <button id="resetViewBtn">🗺️ Сбросить вид</button>
@@ -234,7 +347,7 @@
 <script th:inline="javascript">
   // Данные клиник из Spring Model
   const clinicsData = JSON.parse(/*[[${clinicsJson}]]*/ '[]');
-  const profile = JSON.parse(/*[[${profile}]]*/ '[]');
+  const profile = JSON.parse(/*[[${profile}]]*/ '{}');
 
   // Инициализация карты
   const map = L.map('map').setView([47.236389,  38.896944], 12);
@@ -287,23 +400,10 @@
                               style="background: #28a745; padding: 5px 10px; font-size: 12px;">
                           🚗 Построить маршрут
                       </button>
-<!--                      <button onclick="buildRouteToClinic(${clinic.latitude}, ${clinic.longitude}, '${clinic.name.replace(/'/g, "\\'")}')"-->
-<!--                              style="background: #28a745; padding: 5px 10px; font-size: 12px;">-->
-<!--                          Добавить в избранное-->
-<!--                      </button>-->
-
-<!--                      <form th:action="@{/createFavorite?clinicId={id1}(id1=${clinic.id})&profileId={id2}(id2=${profile.id})}"-->
-<!--                           style="display: inline-block;">-->
-<!--&lt;!&ndash;                      <input type="hidden" name="_method" value="DELETE"/>&ndash;&gt;-->
-<!--                      <button type="submit" style="background: #28a745; padding: 5px 10px; font-size: 12px;">Добавить в избранное</button>-->
-<!--                    </form>-->
-
-<!-- Удалите th:action и используйте обычный переход -->
-<a href="/createFavorite?clinicId=${clinic.id}&profileId=${profile.id}"
-   style="background: #ffc107; padding: 5px 10px; font-size: 12px; text-decoration: none; color: black; display: inline-block; border-radius: 5px;">
-    ⭐ Добавить в избранное
-</a>
-
+                      <a href="/createFavorite?clinicId=${clinic.id}&profileId=${profile.id}"
+                         style="background: #ffc107; padding: 5px 10px; font-size: 12px; text-decoration: none; color: black; display: inline-block; border-radius: 5px;">
+                          ⭐ Добавить в избранное
+                      </a>
                       <a href="/getClinic?id=${clinic.id}" style="color: #667eea; margin-left: 10px;">Подробнее →</a>
                   </div>
               `;
@@ -339,7 +439,7 @@
               <p>📍 ${clinic.address || 'Адрес не указан'}</p>
               <p>🏥 ${clinic.type || 'Общая'}</p>
               <button onclick="buildRouteToClinic(${clinic.latitude}, ${clinic.longitude}, '${clinic.name.replace(/'/g, "\\'")}')"
-                      style="background: #28a745; <pa></pa>dding: 5px; margin-top: 5px; font-size: 11px;">
+                      style="background: #28a745; padding: 5px; margin-top: 5px; font-size: 11px;">
                   🚗 Построить маршрут
               </button>
           `;
@@ -402,7 +502,6 @@
 
           // Отрисовываем маршрут на карте
           if (routeData.geometry) {
-              // Если бэкэнд возвращает GeoJSON geometry
               const routeLayer = L.geoJSON(routeData.geometry, {
                   style: {
                       color: '#2563eb',
@@ -413,7 +512,6 @@
 
               currentRoute = routeLayer;
 
-              // Добавляем маркеры начала и конца пути
               const startIcon = L.divIcon({
                   html: '🚩',
                   iconSize: [25, 25],
@@ -434,7 +532,6 @@
                   .bindPopup(clinicName)
                   .addTo(map);
 
-              // Отображаем информацию о маршруте
               const distance = routeData.distance ? (routeData.distance / 1000).toFixed(1) : 'N/A';
               const duration = routeData.duration ? Math.round(routeData.duration / 60) : 'N/A';
 
@@ -447,12 +544,10 @@
                   </div>
               `;
 
-              // Приближаем карту к маршруту
               const bounds = routeLayer.getBounds();
               map.fitBounds(bounds, {padding: [50, 50]});
 
           } else if (routeData.features && routeData.features.length > 0) {
-              // Если бэкэнд возвращает полный GeoJSON с features
               const routeLayer = L.geoJSON(routeData, {
                   style: {
                       color: '#2563eb',
@@ -494,7 +589,6 @@
           currentRoute = null;
       }
 
-      // Очищаем временные маркеры
       map.eachLayer(layer => {
           if (layer instanceof L.Marker &&
               layer.options.icon &&
@@ -555,59 +649,6 @@
       }
 
       displayClinics(filtered);
-  }
-
-  // Поиск ближайших клиник через GPS
-  function findNearbyClinics() {
-      if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(async function(position) {
-              const lat = position.coords.latitude;
-              const lng = position.coords.longitude;
-
-              userLocation = { lat: lat, lng: lng };
-              map.setView([lat, lng], 13);
-
-              if (userMarker) {
-                  map.removeLayer(userMarker);
-              }
-
-              userMarker = L.marker([lat, lng], {
-                  icon: L.divIcon({
-                      html: '📍',
-                      iconSize: [30, 30],
-                      className: 'user-marker'
-                  }),
-                  zIndexOffset: 1000
-              }).addTo(map);
-              userMarker.bindPopup('Вы здесь').openPopup();
-
-              const locationStatus = document.getElementById('locationStatus');
-              const coordsDisplay = document.getElementById('coordsDisplay');
-              coordsDisplay.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-              locationStatus.style.display = 'block';
-              locationStatus.style.background = '#d4edda';
-              locationStatus.style.border = '1px solid #c3e6cb';
-
-              try {
-                  const response = await fetch(`/api/clinics/nearby?lat=${lat}&lng=${lng}&radius=5`);
-                  const nearbyClinics = await response.json();
-                  displayClinics(nearbyClinics);
-              } catch (error) {
-                  console.error('Ошибка:', error);
-                  alert('Не удалось найти клиники рядом с вами');
-              }
-
-              setTimeout(() => {
-                  locationStatus.style.background = '#f0f0f0';
-                  locationStatus.style.border = 'none';
-              }, 2000);
-
-          }, function(error) {
-              alert('Не удалось определить местоположение. Укажите его на карте вручную.');
-          });
-      } else {
-          alert('Геолокация не поддерживается');
-      }
   }
 
   // Обработка клика по карте
@@ -683,7 +724,6 @@
   // Добавляем обработчики
   document.getElementById('searchInput').addEventListener('input', filterClinics);
   document.getElementById('typeFilter').addEventListener('change', filterClinics);
-<!--  document.getElementById('nearbyBtn').addEventListener('click', findNearbyClinics);-->
   document.getElementById('resetViewBtn').addEventListener('click', resetView);
   document.getElementById('selectOnMapBtn').addEventListener('click', () => {
       map.once('click', handleMapClick);
@@ -697,6 +737,7 @@
   L.control.scale().addTo(map);
 
   console.log('Карта загружена. Клиник найдено:', clinicsData.length);
+  console.log('Профиль пользователя:', profile);
 </script>
 </body>
 </html>
