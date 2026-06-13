@@ -107,6 +107,18 @@ public class ClinicPageController {
         return "clinic-page";
     }
 
+    @GetMapping(value = "/guest/getClinic")
+    public String getClinicAsGuest(@RequestParam(value = "id") Long id, Model model) {
+
+        Clinic clinic = clinicService.getClinicById(id);
+        List<Comment> comments = commentService.getApprovedCommentsByClinicId(id);
+
+        model.addAttribute("clinic", clinic);
+        model.addAttribute("reviews", comments);
+
+        return "clinic-page-guest";
+    }
+
 
     @GetMapping(value = "/admin/getAllClinics")
     public String getAllClinicsAsAdmin(Model model) {
@@ -122,6 +134,23 @@ public class ClinicPageController {
         return "map-view-clickable-admin";
 
     }
+
+
+    @GetMapping(value = "/guest/getAllClinics")
+    public String getAllClinicsAsGuest(Model model) {
+        List<Clinic> clinicsList = clinicService.getAllClinics();
+
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String clinicsJson = mapper.writeValueAsString(clinicsList);
+        model.addAttribute("clinicsJson", clinicsJson);
+
+
+
+        return "map-view-clickable-guest";
+    }
+
 
     @GetMapping(value = "/user/getAllClinics")
     public String getAllClinicsAsUser(Model model) {
@@ -141,6 +170,10 @@ public class ClinicPageController {
         Map<String, Object> profileDto = new HashMap<>();
         Profile profile = user.getProfile();
 
+        if (profile == null) {
+            profile = new Profile();        // заглушка для админа
+        }
+
 //        Hibernate.initialize(profile.getFavoriteClinics()); //
 
         profileDto.put("id", profile.getId());
@@ -154,7 +187,7 @@ public class ClinicPageController {
         model.addAttribute("profile", profileJson);
 
 
-        return "map-view-clickable2";
+        return "map-view-clickable-user";
 
     }
 

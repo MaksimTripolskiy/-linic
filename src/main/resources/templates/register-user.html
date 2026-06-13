@@ -350,6 +350,9 @@
             </button>
         </form>
 
+        <br>
+        <button class="register-btn" onclick="loginAsGuest()">Войти как гость</button>
+
         <div class="login-link">
             Уже есть аккаунт? <a href="/login">Авторизоваться</a>
         </div>
@@ -357,6 +360,17 @@
 </div>
 
 <script>
+
+    function loginAsGuest() {
+        window.location.href = '/guest/getAllClinics';
+
+    }
+
+
+
+
+
+
     // Form elements
     const form = document.getElementById('registerForm');
     const usernameInput = document.getElementById('username');

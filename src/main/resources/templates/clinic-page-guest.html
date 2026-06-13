@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title th:text="${clinic.name} + ' | Отзывы пациентов'">Медицинский центр «Здоровье+» | Отзывы пациентов</title>
+    <!-- Google Fonts и Font Awesome для иконок -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f7fc;
+            color: #1a2c3e;
+            line-height: 1.5;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        /* Шапка и основная информация */
+        .hero {
+            background: linear-gradient(135deg, #0b4f6c 0%, #1b7f9e 100%);
+            padding: 2.5rem 2rem;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hero h1 i {
+            font-size: 2rem;
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 60%;
+        }
+
+        .rating-badge {
+            background: rgba(255,215,0,0.2);
+            backdrop-filter: blur(4px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-weight: 500;
+            margin-top: 12px;
+            font-size: 0.95rem;
+        }
+
+        .rating-badge i {
+            color: #ffcd4a;
+        }
+
+        .info-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 1.8rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .info-card {
+            flex: 1;
+            min-width: 180px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .info-card i {
+            font-size: 1.8rem;
+            opacity: 0.9;
+        }
+
+        .info-card div p:first-child {
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+
+        .info-card div p:last-child {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* два блока: отзывы и форма */
+        .main-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .reviews-section {
+            flex: 2;
+            min-width: 260px;
+        }
+
+        .form-section {
+            flex: 1.2;
+            min-width: 280px;
+            background: #f9fafc;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            align-self: start;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            border: 1px solid #e9edf2;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 5px solid #1b7f9e;
+            padding-left: 1rem;
+        }
+
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 1.8rem;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .review-card {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid #eef2f6;
+            transition: all 0.2s;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .reviewer-name {
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reviewer-name i {
+            color: #1b7f9e;
+            font-size: 0.9rem;
+        }
+
+        .review-stars {
+            color: #f5b042;
+            letter-spacing: 2px;
+            font-size: 0.85rem;
+        }
+
+        .review-date {
+            font-size: 0.7rem;
+            color: #7c8b9c;
+            margin-top: 4px;
+        }
+
+        .review-text {
+            margin-top: 10px;
+            color: #2c3e4e;
+            line-height: 1.45;
+            font-size: 0.95rem;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 2rem;
+            background: #fef9e6;
+            border-radius: 1rem;
+        }
+
+        /* Форма */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: #1f3b4a;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #dce3ea;
+            border-radius: 1rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #1b7f9e;
+            box-shadow: 0 0 0 3px rgba(27,127,158,0.2);
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 10px;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 1.6rem;
+            color: #cfdde6;
+            cursor: pointer;
+            transition: 0.1s;
+            margin-bottom: 0;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: #f5b042;
+        }
+
+        .star-rating-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-submit {
+            background: #0b4f6c;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 0.9rem;
+            font-weight: 600;
+            border-radius: 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            background: #0a4058;
+            transform: scale(0.98);
+        }
+
+        .toast-msg {
+            background: #2e7d64;
+            color: white;
+            padding: 10px;
+            border-radius: 40px;
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border-color: #e2e8f0;
+        }
+
+        footer {
+            background: #f1f5f9;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.8rem;
+            color: #4b6a7f;
+            border-top: 1px solid #e2edf2;
+        }
+
+        @media (max-width: 750px) {
+            .hero h1 { font-size: 1.6rem; }
+            .main-layout { padding: 1.2rem; }
+            .section-title { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Блок информации о клинике (данные из модели) -->
+    <div class="hero">
+        <h1>
+            <i class="fas fa-hospital-user"></i>
+            <span th:text="${clinic.name}">Медицинский центр «Здоровье+»</span>
+        </h1>
+        <div class="rating-badge">
+            <i class="fas fa-star"></i>
+            <span th:text="${#numbers.formatDecimal(avgRating, 1, 1)}">4.8</span> ★
+            <span th:text="'(' + ${reviews.size()} + ' ' + ${reviewCountText} + ')'">(12 отзывов)</span>
+        </div>
+        <div class="info-grid">
+            <div class="info-card">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                    <p>Адрес</p>
+                    <p th:text="${clinic.address}">г. Москва, ул. Медиков, 12</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-clock"></i>
+                <div>
+                    <p>Режим работы</p>
+                    <p th:text="${clinic.workHours}">Пн-Вс: 08:00 – 21:00</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-stethoscope"></i>
+                <div>
+                    <p>Направления</p>
+                    <p th:text="${clinic.type}">Терапия, Кардиология, Неврология</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-phone-alt"></i>
+                <div>
+                    <p>Телефон</p>
+                    <p th:text="${clinic.phone}">+7 (495) 123-45-67</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <!-- Список отзывов (из модели) -->
+        <div class="reviews-section">
+            <div class="section-title">
+                <i class="fas fa-comments"></i>
+                Отзывы пациентов
+            </div>
+            <div id="reviewsListContainer" class="reviews-list">
+                <div th:if="${reviews.isEmpty()}" class="empty-message">
+                    <i class="far fa-frown"></i> Пока нет отзывов. Будьте первым, кто оставит отзыв!
+                </div>
+                <div th:each="review : ${reviews}" class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-name">
+                            <i class="fas fa-user-circle"></i>
+                            <span th:text="${review.author}">Анна П.</span>
+                        </div>
+                        <div class="review-stars" th:with="rating=${review.rating}">
+                            <th:block th:each="i, iterStat : ${#numbers.sequence(1, 5)}">
+                                <i th:if="${iterStat.index < rating}" class="fas fa-star"></i>
+                                <i th:unless="${iterStat.index < rating}" class="far fa-star"></i>
+                            </th:block>
+                        </div>
+                    </div>
+                    <div class="review-date">
+                        <i class="far fa-calendar-alt"></i>
+                        <span th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy')}">18.02.2025</span>
+                    </div>
+                    <div class="review-text" th:text="${review.text}">Текст отзыва</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Автоматическое скрытие сообщения через 3.5 секунды
+    const feedbackDiv = document.getElementById('formFeedback');
+    if (feedbackDiv && feedbackDiv.innerText.trim() !== '') {
+        setTimeout(() => {
+            feedbackDiv.style.opacity = '0';
+        }, 3500);
+    }
+</script>
+</body>
+</html>

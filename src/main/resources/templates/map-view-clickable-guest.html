@@ -276,19 +276,6 @@
     <div class="header-title">
       <h1>🏥 Geoclinic - Карта медицинских центров</h1>
     </div>
-    <div class="header-buttons">
-      <form th:action="@{/getProfile}" method="get" style="margin: 0;">
-        <button type="submit" class="header-btn profile-btn">
-          👤 Мой профиль
-        </button>
-      </form>
-
-      <form th:action="@{/logout}" method="get" style="margin: 0;">
-        <button type="submit" class="header-btn logout-btn">
-          🚪 Выйти из профиля
-        </button>
-      </form>
-    </div>
   </div>
   <div class="header-subtitle">
     <h2>
@@ -306,7 +293,7 @@
 
     <div class="type-filter">
       <select id="typeFilter">
-        <option value="all">All</option>
+        <option value="all">Все</option>
         <option value="private">Private Clinic</option>
         <option value="public">Public Hospital</option>
         <option value="specialized">Specialized Clinic</option>
@@ -400,11 +387,7 @@
                               style="background: #28a745; padding: 5px 10px; font-size: 12px;">
                           🚗 Построить маршрут
                       </button>
-                      <a href="/createFavorite?clinicId=${clinic.id}&profileId=${profile.id}"
-                         style="background: #ffc107; padding: 5px 10px; font-size: 12px; text-decoration: none; color: black; display: inline-block; border-radius: 5px;">
-                          ⭐ Добавить в избранное
-                      </a>
-                      <a href="/getClinic?id=${clinic.id}" style="color: #667eea; margin-left: 10px;">Подробнее →</a>
+                      <a href="/guest/getClinic?id=${clinic.id}" style="color: #667eea; margin-left: 10px;">Подробнее →</a>
                   </div>
               `;
 
@@ -690,7 +673,7 @@
       try {
           const response = await fetch(`/api/clinics/nearby?lat=${lat}&lng=${lng}&radius=5`);
           const nearbyClinics = await response.json();
-          displayClinics(nearbyClinics);
+          displayClinics(clinicsData);
       } catch (error) {
           console.error('Ошибка:', error);
           alert('Не удалось найти клиники рядом с выбранной позицией');

@@ -26,14 +26,14 @@ public class Main {
 
 
 
-//        RegistrationRequest req = new RegistrationRequest();
-//        req.setUsername("admin");
-//        req.setPassword("pass");
-//
-//        UserService service = context.getBean(UserService.class);
-//
-//
-//        service.registerAdminUser(req);
+        RegistrationRequest req = new RegistrationRequest();
+        req.setUsername("admin");
+        req.setPassword("pass");
+
+        UserService service = context.getBean(UserService.class);
+
+
+        service.registerAdminUser(req);
 
         //---------
 

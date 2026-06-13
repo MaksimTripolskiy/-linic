@@ -25,12 +25,31 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+
+//            http
+//                    .anonymous(anonymous -> anonymous
+//                            .principal("guest")           // имя principal'а
+//                            .authorities("ROLE_GUEST")    // кастомная роль вместо ROLE_ANONYMOUS
+//                    )
+//                    .authorizeHttpRequests(auth -> auth
+//                            .requestMatchers("/public/**", "/guest/**").permitAll()  // доступно всем
+//                            .requestMatchers("/private/**").hasRole("USER")         // только юзеры
+//                            .anyRequest().authenticated()
+//                    )
+//                    .formLogin(Customizer.withDefaults());
+//
+//            return http.build();
+//        }
+
         http
                 .csrf(csrf -> csrf.disable())  // Disable CSRF protection
-                .authorizeHttpRequests(authz -> authz
-                        // Public endpoint - accessible to everyone
-//                        .requestMatchers("/getAllClinics").permitAll()
-                        .requestMatchers("/").permitAll()
+                    .anonymous(anonymous -> anonymous
+                                    .principal("guest")           // имя principal'а
+                                    .authorities("ROLE_GUEST")    // кастомная роль вместо ROLE_ANONYMOUS
+                            )
+                    .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/","/guest/**","/api/route").permitAll()
                                 .requestMatchers("/registerUser").permitAll()
                                 .requestMatchers("/login.html").permitAll()
 
