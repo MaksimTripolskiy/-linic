@@ -32,10 +32,8 @@ public class ClinicPageController {
     private CommentService commentService;
     @Autowired
     private UserService userService;
-    private ProfileService profileService;
-    private String string;
 
-    public ClinicPageController(ClinicService clinicService, CommentService commentService, ProfileService profileService) {
+    public ClinicPageController(ClinicService clinicService, CommentService commentService) {
         this.clinicService = clinicService;
         this.commentService = commentService;
     }
@@ -48,7 +46,7 @@ public class ClinicPageController {
 
     @GetMapping("/login")
     public String getLogin() {
-        return string;
+        return "login";
     }
 
 //    @GetMapping("/createClinic")

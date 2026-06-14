@@ -60,7 +60,7 @@ public class SecurityConfig {
                 )
 
                 .formLogin(form -> form
-//                        .loginPage("/registerUser2")
+                        .loginPage("/login")
                         .successHandler(successHandler)
                         .permitAll()
                 )

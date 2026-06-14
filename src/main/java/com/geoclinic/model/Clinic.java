@@ -31,12 +31,10 @@ public class Clinic {
     private double latitude;
     @Column(name="longitude")
     private double longitude;
-//    @Column(name="open_time")
-//    private LocalTime openTime;
-//    @Column(name="close_time")
-//    private LocalTime closeTime;
     @Column(name="work_hours")
     private String workHours;
+    @Column(name="hyperlink")
+    private String hyperlink;
 
 
     @OneToMany(mappedBy = "clinic",

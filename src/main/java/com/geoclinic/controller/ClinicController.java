@@ -27,15 +27,6 @@ public class ClinicController {
     }
 
 
-//    @PostMapping(value = "/createClinic")
-//    public String createClinic(@RequestBody Clinic clinic) {
-//        clinicService.createClinic(clinic);
-//        return getAllClinics();
-//    }
-
-
-
-
     @PostMapping(value = "/api/route")
     public String getRoute(@RequestBody RouteCoordinates coords) {
         RouteResponse response = null;
