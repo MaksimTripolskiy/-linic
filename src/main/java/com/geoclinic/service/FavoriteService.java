@@ -45,4 +45,7 @@ public class FavoriteService {
                                     .toList();
     }
 
+    public void removeFavorite(Long clinicId, Long profileId) {
+        favoriteDAO.removeFavorite(clinicId, profileId);
+    }
 }

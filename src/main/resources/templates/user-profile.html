@@ -1,234 +1,277 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Профиль пользователя</title>
-  <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-    }
-
-    .profile-card {
-        max-width: 800px;
-        width: 100%;
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        overflow: hidden;
-        transition: transform 0.3s ease;
-    }
-
-    .profile-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .profile-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 40px;
-        text-align: center;
-        color: white;
-    }
-
-    .avatar {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: 4px solid white;
-        object-fit: cover;
-        margin-bottom: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .profile-name {
-        font-size: 28px;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-
-    .profile-username {
-        font-size: 16px;
-        opacity: 0.9;
-        margin-bottom: 10px;
-    }
-
-    .profile-gender, .profile-age {
-        font-size: 14px;
-        background: rgba(255, 255, 255, 0.2);
-        display: inline-block;
-        padding: 5px 12px;
-        border-radius: 20px;
-        margin: 5px;
-    }
-
-    .profile-body {
-        padding: 30px;
-    }
-
-    .section-title {
-        font-size: 22px;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 20px;
-        border-left: 4px solid #667eea;
-        padding-left: 15px;
-    }
-
-    .clinics-list {
-        list-style: none;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .clinic-item {
-        background: #f8f9fa;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-        border: 1px solid #e9ecef;
-    }
-
-    .clinic-item:hover {
-        background: #f1f3f5;
-        transform: translateX(5px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .clinic-link {
-        display: block;
-        padding: 15px 20px;
-        text-decoration: none;
-        color: #495057;
-        font-weight: 500;
-        transition: color 0.3s ease;
-    }
-
-    .clinic-link:hover {
-        color: #667eea;
-    }
-
-    .clinic-name {
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .clinic-name::before {
-        content: "🏥";
-        font-size: 20px;
-    }
-
-    .empty-message {
-        text-align: center;
-        padding: 40px;
-        color: #6c757d;
-        background: #f8f9fa;
-        border-radius: 12px;
-        font-size: 16px;
-    }
-
-    .info-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-bottom: 30px;
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 12px;
-    }
-
-    .info-item {
-        flex: 1;
-        min-width: 150px;
-    }
-
-    .info-label {
-        font-size: 12px;
-        text-transform: uppercase;
-        color: #6c757d;
-        letter-spacing: 0.5px;
-        margin-bottom: 5px;
-    }
-
-    .info-value {
-        font-size: 18px;
-        font-weight: 500;
-        color: #212529;
-    }
-
-    hr {
-        margin: 20px 0;
-        border: none;
-        border-top: 1px solid #e9ecef;
-    }
-
-    @media (max-width: 600px) {
-        .profile-header {
-            padding: 25px;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль пользователя</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .profile-body {
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
         }
-        .info-grid {
+
+        .profile-card {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid white;
+            object-fit: cover;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .profile-username {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .profile-gender, .profile-age {
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.2);
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin: 5px;
+        }
+
+        .profile-body {
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .clinics-list {
+            list-style: none;
+            display: flex;
             flex-direction: column;
+            gap: 12px;
+        }
+
+        .clinic-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-right: 15px;
+        }
+
+        .clinic-item:hover {
+            background: #f1f3f5;
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .clinic-link {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: #495057;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            flex: 1;
+        }
+
+        .clinic-link:hover {
+            color: #667eea;
+        }
+
+        .clinic-name {
+            font-size: 18px;
+            display: flex;
+            align-items: center;
             gap: 10px;
         }
-    }
-  </style>
+
+        .clinic-name::before {
+            content: "🏥";
+            font-size: 20px;
+        }
+
+        /* Красная кнопка удаления */
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+            transform: scale(1.02);
+        }
+
+        .delete-btn:active {
+            transform: scale(0.98);
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            background: #f8f9fa;
+            border-radius: 12px;
+            font-size: 16px;
+        }
+
+        .info-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .info-item {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6c757d;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: 500;
+            color: #212529;
+        }
+
+        hr {
+            margin: 20px 0;
+            border: none;
+            border-top: 1px solid #e9ecef;
+        }
+
+        @media (max-width: 600px) {
+            .profile-header {
+                padding: 25px;
+            }
+            .profile-body {
+                padding: 20px;
+            }
+            .info-grid {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .clinic-item {
+                flex-wrap: wrap;
+                padding-right: 10px;
+            }
+            .delete-btn {
+                margin-right: 10px;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="profile-card">
-  <div class="profile-header">
-    <div class="profile-name" th:text="${profile.name}">Иван Иванов</div>
-  </div>
 
-  <div class="profile-body">
-    <!-- Дополнительная информационная сетка (дублируем для наглядности) -->
-    <div class="info-grid">
-<!--      <div class="info-item">-->
-<!--        <div class="info-label">Полное имя</div>-->
-<!--        <div class="info-value" th:text="${user.fullName}">Иван Иванов</div>-->
-<!--      </div>-->
-      <div class="info-item">
-        <div class="info-label">Имя пользователя</div>
-        <div class="info-value" th:text="${profile.name != null ? profile.name : '—'}">@ivanov_i</div>
-      </div>
-      <div class="info-item">
-        <div class="info-label">Пол</div>
-        <div class="info-value" th:text="${profile.gender != null ? profile.gender : '—'}">Мужской</div>
-      </div>
-      <div class="info-item">
-        <div class="info-label">Возраст</div>
-        <div class="info-value" th:text="${profile.age != null ? profile.age + ' лет' : '—'}">30 лет</div>
-      </div>
+
+
+<div class="profile-card">
+    <div class="profile-header">
+        <div class="profile-name" th:text="${profile.name}">Иван Иванов</div>
     </div>
 
-    <div class="section-title">Избранные клиники</div>
+    <div class="profile-body">
+        <!-- Дополнительная информационная сетка -->
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Имя пользователя</div>
+                <div class="info-value" th:text="${profile.name != null ? profile.name : '—'}">@ivanov_i</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Пол</div>
+                <div class="info-value" th:text="${profile.gender != null ? profile.gender : '—'}">Мужской</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Возраст</div>
+                <div class="info-value" th:text="${profile.age != null ? profile.age + ' лет' : '—'}">30 лет</div>
+            </div>
+        </div>
 
-    <!-- Список избранных клиник -->
-    <ul class="clinics-list" th:if="${not #lists.isEmpty(profile.favoriteClinics)}">
-      <li th:each="clinic : ${profile.favoriteClinics}" class="clinic-item">
-        <!-- Ссылка на отдельную HTML-страницу клиники, например /clinics/{id} или /clinic.html?id=... -->
-        <!-- Атрибут th:href формируется динамически -->
-        <a th:href="@{/getClinic?id={id}(id=${clinic.id})}" class="clinic-link">
-          <span class="clinic-name" th:text="${clinic.name}">Вита</span>
-        </a>
-      </li>
-    </ul>
-  </div>
+        <div class="section-title">Избранные клиники</div>
+
+        <!-- Список избранных клиник с красной кнопкой удаления -->
+        <ul class="clinics-list" th:if="${not #lists.isEmpty(profile.favoriteClinics)}">
+            <li th:each="clinic : ${profile.favoriteClinics}" class="clinic-item">
+                <!-- Ссылка на страницу клиники -->
+                <a th:href="@{/getClinic?id={id}(id=${clinic.id})}" class="clinic-link">
+                    <span class="clinic-name" th:text="${clinic.name}"></span>
+                </a>
+                <!-- Красная кнопка удаления без JS подтверждения -->
+                <a th:href="@{/removeFavorite(clinicId=${clinic.id}, profileId=${profile.id})}">
+                    <button type="submit" class="delete-btn">✕ Удалить</button>
+                </a>
+            </li>
+        </ul>
+
+        <!-- Пустое состояние -->
+        <div th:if="${#lists.isEmpty(profile.favoriteClinics)}" class="empty-message">
+            У вас пока нет избранных клиник
+        </div>
+    </div>
 </div>
 </body>
 </html>
