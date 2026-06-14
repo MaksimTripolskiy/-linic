@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль пользователя</title>
+    <title>Профиль пользователя - Geoclinic</title>
     <style>
         * {
             margin: 0;
@@ -13,12 +13,107 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f5f5f5;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER СТИЛИ (как на главной) ===== */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-title {
+            flex: 1;
+        }
+
+        .header-title h1 {
+            margin: 0 0 5px 0;
+            font-size: 24px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .header-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 150px;
+            color: white;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .header-btn:active {
+            transform: translateY(0);
+        }
+
+        .profile-btn {
+            background: #28a745;
+            border-color: #28a745;
+        }
+
+        .profile-btn:hover {
+            background: #218838;
+            border-color: #218838;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+            border-color: #c82333;
+        }
+
+        .header-subtitle {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .header-subtitle p {
+            margin: 0;
+        }
+
+        /* ===== ПРОФИЛЬ КАРТОЧКА (центрируем с отступом от хедера) ===== */
+        .profile-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 40px 20px;
+            flex: 1;
         }
 
         .profile-card {
@@ -136,7 +231,6 @@
             font-size: 20px;
         }
 
-        /* Красная кнопка удаления */
         .delete-btn {
             background-color: #dc3545;
             color: white;
@@ -222,56 +316,73 @@
                 margin-right: 10px;
                 margin-bottom: 10px;
             }
+            .header-top {
+                flex-direction: column;
+                text-align: center;
+            }
+            .header-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+            .header-btn {
+                flex: 1;
+            }
         }
     </style>
 </head>
 <body>
 
-
-
-<div class="profile-card">
-    <div class="profile-header">
-        <div class="profile-name" th:text="${profile.name}">Иван Иванов</div>
-    </div>
-
-    <div class="profile-body">
-        <!-- Дополнительная информационная сетка -->
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Имя пользователя</div>
-                <div class="info-value" th:text="${profile.name != null ? profile.name : '—'}">@ivanov_i</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Пол</div>
-                <div class="info-value" th:text="${profile.gender != null ? profile.gender : '—'}">Мужской</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Возраст</div>
-                <div class="info-value" th:text="${profile.age != null ? profile.age + ' лет' : '—'}">30 лет</div>
-            </div>
-        </div>
-
-        <div class="section-title">Избранные клиники</div>
-
-        <!-- Список избранных клиник с красной кнопкой удаления -->
-        <ul class="clinics-list" th:if="${not #lists.isEmpty(profile.favoriteClinics)}">
-            <li th:each="clinic : ${profile.favoriteClinics}" class="clinic-item">
-                <!-- Ссылка на страницу клиники -->
-                <a th:href="@{/getClinic?id={id}(id=${clinic.id})}" class="clinic-link">
-                    <span class="clinic-name" th:text="${clinic.name}"></span>
-                </a>
-                <!-- Красная кнопка удаления без JS подтверждения -->
-                <a th:href="@{/removeFavorite(clinicId=${clinic.id}, profileId=${profile.id})}">
-                    <button type="submit" class="delete-btn">✕ Удалить</button>
-                </a>
-            </li>
-        </ul>
-
-        <!-- Пустое состояние -->
-        <div th:if="${#lists.isEmpty(profile.favoriteClinics)}" class="empty-message">
-            У вас пока нет избранных клиник
+<!-- ===== ХЕДЕР КАК НА ГЛАВНОЙ СТРАНИЦЕ ===== -->
+<div class="header">
+    <div class="header-top">
+        <div class="header-title">
+            <a href="/user/getAllClinics" style="color: white; text-decoration: none;">
+                <h1>🏥 Geoclinic - Карта медицинских центров</h1>
+            </a>
         </div>
     </div>
 </div>
+
+<!-- ===== КОНТЕНТ ПРОФИЛЯ ===== -->
+<div class="profile-wrapper">
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="profile-name" th:text="${profile.name}">Иван Иванов</div>
+        </div>
+
+        <div class="profile-body">
+            <!-- Информационная сетка -->
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Имя пользователя</div>
+                    <div class="info-value" th:text="${profile.name != null ? profile.name : '—'}">@ivanov_i</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Пол</div>
+                    <div class="info-value" th:text="${profile.gender != null ? profile.gender : '—'}">Мужской</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Возраст</div>
+                    <div class="info-value" th:text="${profile.age != null ? profile.age + ' лет' : '—'}">30 лет</div>
+                </div>
+            </div>
+
+            <div class="section-title">⭐ Избранные клиники</div>
+
+            <!-- Список избранных клиник с красной кнопкой удаления -->
+            <ul class="clinics-list" th:if="${not #lists.isEmpty(profile.favoriteClinics)}">
+                <li th:each="clinic : ${profile.favoriteClinics}" class="clinic-item">
+                    <a th:href="@{/getClinic?id={id}(id=${clinic.id})}" class="clinic-link">
+                        <span class="clinic-name" th:text="${clinic.name}">Название клиники</span>
+                    </a>
+                    <a th:href="@{/removeFavorite(clinicId=${clinic.id}, profileId=${profile.id})}">
+                        <button type="button" class="delete-btn">✕ Удалить</button>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
